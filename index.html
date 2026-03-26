@@ -6,7 +6,11 @@
     <title>Whisper · Anonymous Confessions & Genuine Advice</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         :root {
             --bg: #f8fafc;
@@ -21,12 +25,14 @@
             --warning: #f59e0b;
             --accent: #ec489a;
         }
+
         body.dark {
             --bg: #0f172a;
             --card: #1e293b;
             --text: #f1f5f9;
             --border: #334155;
         }
+
         body {
             background: var(--bg);
             color: var(--text);
@@ -34,9 +40,13 @@
             transition: all 0.2s;
             padding: 1rem;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
 
-        /* header */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -45,6 +55,7 @@
             gap: 1rem;
             margin-bottom: 2rem;
         }
+
         .logo h1 {
             font-size: 2rem;
             background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
@@ -52,8 +63,19 @@
             -webkit-background-clip: text;
             color: transparent;
         }
-        .logo p { font-size: 0.9rem; opacity: 0.8; }
-        .theme-toggle, .dashboard-btn {
+
+        .logo p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .user-menu {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .icon-btn {
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: 2rem;
@@ -61,16 +83,19 @@
             cursor: pointer;
             font-weight: 500;
             color: var(--text);
+            transition: all 0.2s;
         }
-        .user-menu {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
+
+        .icon-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
+
         .notification-badge {
             position: relative;
             cursor: pointer;
         }
+
         .notification-count {
             position: absolute;
             top: -8px;
@@ -86,7 +111,7 @@
             justify-content: center;
         }
 
-        /* cards */
+        /* Cards */
         .card {
             background: var(--card);
             border-radius: 1.5rem;
@@ -94,9 +119,14 @@
             margin-bottom: 1.5rem;
             box-shadow: 0 4px 6px -2px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.1);
             border: 1px solid var(--border);
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .card:hover { transform: translateY(-2px); }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.02);
+        }
+
         h2 {
             font-size: 1.5rem;
             margin-bottom: 1rem;
@@ -104,6 +134,8 @@
             align-items: center;
             gap: 0.5rem;
         }
+
+        /* Forms */
         input, textarea, select {
             width: 100%;
             padding: 0.75rem;
@@ -112,7 +144,15 @@
             background: var(--bg);
             color: var(--text);
             margin-bottom: 1rem;
+            transition: all 0.2s;
         }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+
         button {
             background: var(--primary);
             color: white;
@@ -121,18 +161,33 @@
             border-radius: 2rem;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.2s;
         }
-        button:hover { background: var(--primary-dark); }
+
+        button:hover {
+            background: var(--primary-dark);
+            transform: scale(0.98);
+        }
+
         .secondary-btn {
             background: transparent;
             border: 1px solid var(--border);
             color: var(--text);
         }
-        .danger-btn { background: var(--danger); }
-        .danger-btn:hover { background: #dc2626; }
 
-        /* feed */
+        .secondary-btn:hover {
+            background: var(--bg);
+        }
+
+        .danger-btn {
+            background: var(--danger);
+        }
+
+        .danger-btn:hover {
+            background: #dc2626;
+        }
+
+        /* Feed */
         .feed-header {
             display: flex;
             justify-content: space-between;
@@ -141,18 +196,24 @@
             gap: 1rem;
             margin-bottom: 1rem;
         }
+
         .search-box {
             display: flex;
             gap: 0.5rem;
             flex: 1;
         }
-        .search-box input { margin-bottom: 0; }
+
+        .search-box input {
+            margin-bottom: 0;
+        }
+
         .filter-bar {
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
             margin-bottom: 1rem;
         }
+
         .filter-chip, .trending-chip {
             background: var(--bg);
             border: 1px solid var(--border);
@@ -160,21 +221,32 @@
             padding: 0.3rem 1rem;
             cursor: pointer;
             font-size: 0.8rem;
+            transition: all 0.2s;
         }
+
         .filter-chip.active, .trending-chip.active {
             background: var(--primary);
             color: white;
+            border-color: var(--primary);
         }
+
         .confession-feed {
             max-height: 500px;
             overflow-y: auto;
         }
+
         .confession-item {
             border-bottom: 1px solid var(--border);
             padding: 1rem 0;
             cursor: pointer;
+            transition: all 0.2s;
         }
-        .confession-item:hover { background: rgba(59,130,246,0.05); padding-left: 0.5rem; }
+
+        .confession-item:hover {
+            background: rgba(59,130,246,0.05);
+            padding-left: 0.5rem;
+        }
+
         .confession-header {
             display: flex;
             justify-content: space-between;
@@ -182,12 +254,14 @@
             flex-wrap: wrap;
             gap: 0.5rem;
         }
+
         .confession-stats {
             display: flex;
             gap: 0.8rem;
             font-size: 0.8rem;
             color: #64748b;
         }
+
         .expiry-badge {
             font-size: 0.7rem;
             background: var(--warning);
@@ -195,10 +269,87 @@
             padding: 0.2rem 0.5rem;
             border-radius: 1rem;
         }
-        .like-btn { cursor: pointer; color: var(--danger); }
-        .like-btn.liked { color: var(--danger); opacity: 1; }
 
-        /* modal */
+        .like-btn {
+            cursor: pointer;
+            color: var(--danger);
+            transition: transform 0.1s;
+        }
+
+        .like-btn.liked {
+            color: var(--danger);
+            opacity: 1;
+        }
+
+        .like-btn:active {
+            transform: scale(1.2);
+        }
+
+        /* Advice items */
+        .advice-item {
+            background: var(--bg);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .advice-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            color: #64748b;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .votes {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .vote-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text);
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+
+        .vote-btn.active {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        .report-btn, .delete-advice-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: var(--danger);
+            padding: 0;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 1rem;
+            text-align: center;
+        }
+
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -210,15 +361,23 @@
             z-index: 2000;
             justify-content: center;
             align-items: center;
+            backdrop-filter: blur(4px);
         }
-        .modal.active { display: flex; }
+
+        .modal.active {
+            display: flex;
+        }
+
         .modal-content {
             background: var(--card);
             border-radius: 1.5rem;
             padding: 1.5rem;
             max-width: 500px;
             width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
         }
+
         .toast {
             position: fixed;
             bottom: 20px;
@@ -233,17 +392,31 @@
             transition: opacity 0.3s;
             pointer-events: none;
         }
-        .view { display: none; }
-        .view.active { display: block; }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
         .back-btn {
             display: inline-block;
             margin-bottom: 1rem;
             cursor: pointer;
             color: var(--primary);
+            font-weight: 500;
         }
+
         @media (max-width: 768px) {
-            .card { padding: 1rem; }
-            h2 { font-size: 1.2rem; }
+            .card {
+                padding: 1rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
@@ -259,8 +432,8 @@
                 <i class="fas fa-bell"></i>
                 <span id="notificationCount" class="notification-count" style="display:none;">0</span>
             </div>
-            <button class="dashboard-btn" id="dashboardBtn"><i class="fas fa-user"></i> My Stuff</button>
-            <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+            <button class="icon-btn" id="dashboardBtn"><i class="fas fa-user"></i> My Stuff</button>
+            <button class="icon-btn" id="themeToggle"><i class="fas fa-moon"></i></button>
         </div>
     </div>
 
@@ -423,32 +596,20 @@
     let activeExpertSector = "mental health";
 
     // Helper: unique ID
-    function uid() { return Date.now() + '-' + Math.random().toString(36).substr(2, 8); }
+    function uid() {
+        return Date.now() + '-' + Math.random().toString(36).substr(2, 8);
+    }
 
     // Show toast
-    function showToast(msg) {
+    function showToast(msg, isError = false) {
         const toast = document.getElementById("toast");
         toast.textContent = msg;
+        toast.style.background = isError ? "#ef4444" : "#1f2e3a";
         toast.style.opacity = "1";
-        setTimeout(() => toast.style.opacity = "0", 2500);
-    }
-
-    // ---------- User profile (reputation based on votes on their advice) ----------
-    async function getUserReputation() {
-        let rep = 0;
-        await stores.votes.iterate((vote) => {
-            if (vote.targetAuthorId === userId && vote.voteType === 'up') rep++;
-            else if (vote.targetAuthorId === userId && vote.voteType === 'down') rep--;
-        });
-        return rep;
-    }
-
-    async function updateProfileDisplay() {
-        const rep = await getUserReputation();
-        document.getElementById("profileInfo").innerHTML = `
-            <p><strong>Your ID:</strong> ${userId.substring(0, 12)}...</p>
-            <p><strong>Reputation:</strong> ${rep} points (from advice upvotes/downvotes)</p>
-        `;
+        setTimeout(() => {
+            toast.style.opacity = "0";
+            toast.style.background = "#1f2e3a";
+        }, 2500);
     }
 
     // ---------- Data operations ----------
@@ -482,7 +643,7 @@
         await stores.advice.iterate((value) => {
             if (value.confessionId === confessionId && !value.deleted && !value.reported) list.push(value);
         });
-        return list.sort((a,b) => b.timestamp - a.timestamp);
+        return list.sort((a, b) => b.timestamp - a.timestamp);
     }
 
     async function getAdviceVoteCount(adviceId) {
@@ -509,7 +670,6 @@
                 adviceId, userId, voteType, targetAuthorId: advice?.userId, timestamp: Date.now()
             });
         }
-        // Update reputation (no need to recalc here, just refresh later)
     }
 
     async function likeConfession(confessionId) {
@@ -554,6 +714,24 @@
         };
         await stores.notifications.setItem(notif.id, notif);
         checkNotifications();
+    }
+
+    // ---------- User reputation (based on votes on their advice) ----------
+    async function getUserReputation() {
+        let rep = 0;
+        await stores.votes.iterate((vote) => {
+            if (vote.targetAuthorId === userId && vote.voteType === 'up') rep++;
+            else if (vote.targetAuthorId === userId && vote.voteType === 'down') rep--;
+        });
+        return rep;
+    }
+
+    async function updateProfileDisplay() {
+        const rep = await getUserReputation();
+        document.getElementById("profileInfo").innerHTML = `
+            <p><strong>Your ID:</strong> ${userId.substring(0, 12)}...</p>
+            <p><strong>Reputation:</strong> ${rep} points (from advice upvotes/downvotes)</p>
+        `;
     }
 
     // ---------- AI advice generator ----------
@@ -608,13 +786,13 @@
         if (currentTrend === "trending") {
             const adviceCounts = {};
             await stores.advice.iterate((adv) => { if (!adv.deleted && !adv.reported) adviceCounts[adv.confessionId] = (adviceCounts[adv.confessionId] || 0) + 1; });
-            filtered.sort((a,b) => (adviceCounts[b.id]||0) - (adviceCounts[a.id]||0));
+            filtered.sort((a, b) => (adviceCounts[b.id] || 0) - (adviceCounts[a.id] || 0));
         } else if (currentTrend === "most-liked") {
             const likeCounts = {};
             await stores.likes.iterate((like) => { likeCounts[like.confessionId] = (likeCounts[like.confessionId] || 0) + 1; });
-            filtered.sort((a,b) => (likeCounts[b.id]||0) - (likeCounts[a.id]||0));
+            filtered.sort((a, b) => (likeCounts[b.id] || 0) - (likeCounts[a.id] || 0));
         } else {
-            filtered.sort((a,b) => b.timestamp - a.timestamp);
+            filtered.sort((a, b) => b.timestamp - a.timestamp);
         }
 
         if (filtered.length === 0) {
@@ -640,7 +818,7 @@
                             <span class="expiry-badge">${remaining}</span>
                         </div>
                     </div>
-                    <div>${conf.text.substring(0,200)}${conf.text.length>200?'…':''}</div>
+                    <div>${conf.text.substring(0, 200)}${conf.text.length > 200 ? '…' : ''}</div>
                     <div class="timestamp">${new Date(conf.timestamp).toLocaleString()}</div>
                 </div>
             `;
@@ -674,7 +852,7 @@
     async function showConfessionDetail(confessionId) {
         const confession = await getConfessionById(confessionId);
         if (!confession) {
-            showToast("Confession expired or not found");
+            showToast("Confession expired or not found", true);
             document.getElementById("backToFeed").click();
             return;
         }
@@ -764,8 +942,8 @@
         const adviceId = e.currentTarget.getAttribute('data-id');
         await setVote(adviceId, 'up');
         if (currentConfessionId) await showConfessionDetail(currentConfessionId);
-        renderFeed(); // update feed counts
-        updateProfileDisplay(); // refresh reputation
+        renderFeed();
+        updateProfileDisplay();
     }
     async function handleDownvote(e) {
         const adviceId = e.currentTarget.getAttribute('data-id');
@@ -842,13 +1020,13 @@
         const content = document.getElementById("detailAdviceText").value.trim();
         if (!content || !currentConfessionId) return;
         const confession = await getConfessionById(currentConfessionId);
-        if (!confession) { showToast("Confession no longer exists"); return; }
+        if (!confession) { showToast("Confession no longer exists", true); return; }
         const advice = {
             id: uid(),
             confessionId: currentConfessionId,
             type: 'community',
             content,
-            authorName: "Someone", // anonymous
+            authorName: "Someone",
             timestamp: Date.now(),
             userId: userId,
             deleted: false,
@@ -857,7 +1035,7 @@
         await saveAdvice(advice);
         // Notify the confession owner (if not the same user)
         if (confession.userId !== userId) {
-            await addNotification(confession.userId, `Someone replied to your confession: "${content.substring(0,50)}..."`, currentConfessionId);
+            await addNotification(confession.userId, `Someone replied to your confession: "${content.substring(0, 50)}..."`, currentConfessionId);
         }
         showToast("Advice posted!");
         document.getElementById("detailAdviceText").value = "";
@@ -876,7 +1054,7 @@
         const content = document.getElementById("modalAdviceText").value.trim();
         if (!content || !currentReplyConfessionId) return;
         const confession = await getConfessionById(currentReplyConfessionId);
-        if (!confession) { showToast("Confession no longer exists"); return; }
+        if (!confession) { showToast("Confession no longer exists", true); return; }
         const advice = {
             id: uid(),
             confessionId: currentReplyConfessionId,
@@ -890,7 +1068,7 @@
         };
         await saveAdvice(advice);
         if (confession.userId !== userId) {
-            await addNotification(confession.userId, `Someone replied to your confession: "${content.substring(0,50)}..."`, currentReplyConfessionId);
+            await addNotification(confession.userId, `Someone replied to your confession: "${content.substring(0, 50)}..."`, currentReplyConfessionId);
         }
         showToast("Advice posted!");
         document.getElementById("replyModal").classList.remove("active");
@@ -907,7 +1085,7 @@
             document.getElementById("editConfessionText").value = conf.text;
             const categorySelect = document.getElementById("editCategory");
             categorySelect.innerHTML = '';
-            ['mental health','relationships','career','finance','health','other'].forEach(c => {
+            ['mental health', 'relationships', 'career', 'finance', 'health', 'other'].forEach(c => {
                 const opt = document.createElement('option');
                 opt.value = c;
                 opt.textContent = c;
@@ -950,7 +1128,7 @@
                 myConfs.push(conf);
             }
         });
-        myConfs.sort((a,b)=>b.timestamp-a.timestamp);
+        myConfs.sort((a, b) => b.timestamp - a.timestamp);
         if (myConfs.length === 0) {
             document.getElementById("myConfessions").innerHTML = "<p>You haven't posted any confessions.</p>";
             return;
@@ -961,7 +1139,7 @@
             html += `
                 <div class="confession-item" style="margin-bottom:1rem;">
                     <div><strong>${conf.anonymous ? 'Anonymous' : 'You'}</strong> · ${conf.category}</div>
-                    <div>${conf.text.substring(0,100)}${conf.text.length>100?'…':''}</div>
+                    <div>${conf.text.substring(0, 100)}${conf.text.length > 100 ? '…' : ''}</div>
                     <div class="timestamp">${new Date(conf.timestamp).toLocaleString()} · <span class="expiry-badge">${remaining}</span></div>
                     <div style="margin-top:0.5rem;">
                         <button class="secondary-btn edit-confession" data-id="${conf.id}">Edit</button>
@@ -998,7 +1176,7 @@
         await stores.advice.iterate((adv) => {
             if (adv.userId === userId && !adv.deleted && adv.type === 'community') myAdv.push(adv);
         });
-        myAdv.sort((a,b)=>b.timestamp-a.timestamp);
+        myAdv.sort((a, b) => b.timestamp - a.timestamp);
         if (myAdv.length === 0) {
             document.getElementById("myAdvice").innerHTML = "<p>You haven't posted any advice.</p>";
             return;
@@ -1010,7 +1188,7 @@
             html += `
                 <div class="advice-item" style="margin-bottom:1rem;">
                     <div><strong>To:</strong> ${confession ? (confession.anonymous ? 'Anonymous' : 'Someone') : 'Unknown'}</div>
-                    <div>${adv.content.substring(0,100)}${adv.content.length>100?'…':''}</div>
+                    <div>${adv.content.substring(0, 100)}${adv.content.length > 100 ? '…' : ''}</div>
                     <div class="advice-meta">👍 ${votes.score} points · ${new Date(adv.timestamp).toLocaleString()}</div>
                     <button class="danger-btn delete-my-advice" data-id="${adv.id}">Delete</button>
                 </div>
@@ -1038,18 +1216,25 @@
         let count = 0;
         await stores.notifications.iterate((n) => { if (n.userId === userId && !n.read) count++; });
         const badge = document.getElementById("notificationCount");
-        if (count > 0) { badge.textContent = count; badge.style.display = "flex"; }
-        else badge.style.display = "none";
+        if (count > 0) {
+            badge.textContent = count;
+            badge.style.display = "flex";
+        } else {
+            badge.style.display = "none";
+        }
     }
     document.getElementById("notificationIcon").addEventListener("click", async () => {
         const list = [];
         await stores.notifications.iterate((n) => { if (n.userId === userId) list.push(n); });
-        list.sort((a,b)=>b.timestamp-a.timestamp);
+        list.sort((a, b) => b.timestamp - a.timestamp);
         const html = list.length ? list.map(n => `<div>${n.message} - ${new Date(n.timestamp).toLocaleString()}</div>`).join('') : "<p>No notifications</p>";
         document.getElementById("notificationsList").innerHTML = html;
         document.getElementById("notificationsModal").classList.add("active");
         // mark as read
-        for (const n of list) { n.read = true; await stores.notifications.setItem(n.id, n); }
+        for (const n of list) {
+            n.read = true;
+            await stores.notifications.setItem(n.id, n);
+        }
         checkNotifications();
     });
     document.getElementById("clearNotifications").addEventListener("click", async () => {
@@ -1129,7 +1314,10 @@
     async function init() {
         await renderFeed();
         renderExpertAdvice();
-        setInterval(() => { renderFeed(); checkNotifications(); }, 60000);
+        setInterval(() => {
+            renderFeed();
+            checkNotifications();
+        }, 60000);
         checkNotifications();
         updateProfileDisplay();
     }
