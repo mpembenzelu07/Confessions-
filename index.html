@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Confession & Advice | Genuine AI + Human Support</title>
+    <title>Whisper · Genuine Confession & Advice Hub</title>
     <style>
         * {
             margin: 0;
@@ -12,100 +12,114 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
-            color: #1e2a3a;
-            line-height: 1.6;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(145deg, #f0f4fa 0%, #d9e2ef 100%);
+            color: #1a2c3e;
+            line-height: 1.5;
             padding: 2rem 1rem;
         }
 
+        /* smooth glass card effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.5);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 28px 40px -16px rgba(0, 0, 0, 0.15);
+        }
+
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
-        /* Header */
-        .header {
+        /* header */
+        .hero {
             text-align: center;
             margin-bottom: 2.5rem;
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            background: linear-gradient(120deg, #2c3e50, #4a627a);
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e3c72, #2b4c7c, #0f2c4e);
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
-            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
         }
 
-        .header p {
-            color: #4a627a;
-            font-size: 1.1rem;
+        .hero p {
+            font-size: 1.2rem;
+            color: #2c4b6e;
+            max-width: 650px;
+            margin: 0.5rem auto 0;
         }
 
-        /* Cards & layout */
-        .grid-2col {
+        /* two column layout */
+        .dashboard {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
 
-        @media (max-width: 800px) {
-            .grid-2col {
+        @media (max-width: 900px) {
+            .dashboard {
                 grid-template-columns: 1fr;
-                gap: 1.5rem;
+                gap: 1.8rem;
             }
         }
 
-        .card {
-            background: white;
-            border-radius: 24px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+        /* inner card spacing */
+        .card-padding {
             padding: 1.8rem;
-            transition: transform 0.2s ease;
         }
 
-        .card:hover {
-            transform: translateY(-3px);
-        }
-
-        .card h2 {
+        h2 {
             font-size: 1.6rem;
+            font-weight: 600;
             margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             border-left: 5px solid #3b82f6;
-            padding-left: 0.8rem;
-            color: #0f172a;
+            padding-left: 1rem;
         }
 
-        /* Form */
+        /* form elements */
         .form-group {
             margin-bottom: 1.2rem;
         }
 
         label {
-            display: block;
-            font-weight: 600;
+            font-weight: 500;
             margin-bottom: 0.4rem;
-            color: #1e293b;
+            display: block;
+            color: #1e3a5f;
         }
 
-        textarea, select, input {
+        textarea, select, input[type="text"] {
             width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #cbd5e1;
-            border-radius: 16px;
+            padding: 0.85rem 1rem;
+            border: 1px solid #cbdbe6;
+            border-radius: 1.5rem;
             font-family: inherit;
-            font-size: 1rem;
-            transition: 0.2s;
-            background: #fefefe;
+            font-size: 0.95rem;
+            background: #ffffffcc;
+            transition: all 0.2s;
         }
 
         textarea:focus, select:focus, input:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+            background: white;
         }
 
         .checkbox {
@@ -115,40 +129,50 @@
         }
 
         .checkbox input {
-            width: auto;
+            width: 1.2rem;
+            height: 1.2rem;
         }
 
         button {
-            background: #3b82f6;
+            background: #2c5f8a;
             color: white;
             border: none;
             padding: 0.8rem 1.5rem;
-            font-size: 1rem;
             font-weight: 600;
-            border-radius: 40px;
+            border-radius: 3rem;
             cursor: pointer;
             transition: 0.2s;
             width: 100%;
+            font-size: 1rem;
         }
 
         button:hover {
-            background: #2563eb;
+            background: #1f4a6e;
             transform: scale(0.98);
         }
 
-        /* Advice boxes */
-        .advice-box {
-            background: #f8fafc;
-            border-radius: 20px;
-            padding: 1.2rem;
-            margin-top: 1rem;
-            border-left: 4px solid #3b82f6;
+        .secondary-btn {
+            background: #e2e8f0;
+            color: #1e293b;
+            margin-top: 0.5rem;
+        }
+
+        .secondary-btn:hover {
+            background: #cbd5e1;
+        }
+
+        /* advice containers */
+        .advice-card {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 1.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255,255,255,0.8);
         }
 
         .advice-text {
-            font-size: 1rem;
-            line-height: 1.5;
-            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+            line-height: 1.45;
             white-space: pre-wrap;
         }
 
@@ -156,100 +180,123 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.8rem;
-            color: #475569;
+            font-size: 0.75rem;
+            color: #4b6a8b;
+            margin-top: 0.7rem;
             border-top: 1px solid #e2e8f0;
             padding-top: 0.6rem;
-            margin-top: 0.5rem;
         }
 
-        .rating {
+        .rating-buttons {
             display: flex;
             gap: 0.8rem;
         }
 
-        .rating span {
+        .rating-buttons span {
             cursor: pointer;
-            transition: 0.1s;
             font-weight: 500;
+            transition: 0.1s;
         }
 
-        .rating span:hover {
-            color: #3b82f6;
+        .rating-buttons span:hover {
+            color: #2563eb;
         }
 
-        .sector-buttons {
+        .sector-pills {
             display: flex;
             flex-wrap: wrap;
             gap: 0.6rem;
             margin: 1rem 0;
         }
 
-        .sector-btn {
-            background: #e2e8f0;
-            color: #1e293b;
-            padding: 0.4rem 1rem;
+        .pill {
+            background: #eef2ff;
+            padding: 0.4rem 1.2rem;
             border-radius: 40px;
             font-size: 0.85rem;
             font-weight: 500;
             cursor: pointer;
             transition: 0.2s;
             border: none;
-            width: auto;
+            color: #1e3a5f;
         }
 
-        .sector-btn.active {
+        .pill.active {
             background: #3b82f6;
             color: white;
         }
 
-        .sector-btn:hover {
-            background: #cbd5e1;
+        .confession-history {
+            max-height: 280px;
+            overflow-y: auto;
         }
 
-        .loading {
-            color: #3b82f6;
-            font-style: italic;
+        .history-item {
+            background: #f8fafc;
+            border-radius: 1.2rem;
+            padding: 0.8rem;
+            margin-bottom: 0.7rem;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .history-item:hover {
+            background: #eef2ff;
+        }
+
+        .timestamp {
+            font-size: 0.7rem;
+            color: #5b7a9a;
         }
 
         footer {
             text-align: center;
             margin-top: 2rem;
             font-size: 0.8rem;
-            color: #5b6e8c;
-            border-top: 1px solid #cbd5e1;
+            color: #3a5a7a;
+            border-top: 1px solid #b9cef0;
             padding-top: 1.5rem;
         }
 
-        hr {
-            margin: 1rem 0;
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2e3a;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="header">
-        <h1>📝 whisper · advice</h1>
-        <p>Share your truth — get genuine AI guidance + wisdom from real‑world experts</p>
+    <div class="hero">
+        <h1>📖 whisper · advice</h1>
+        <p>Share what's heavy. Get genuine AI counsel and wisdom from real‑world experts — completely private.</p>
     </div>
 
-    <div class="grid-2col">
-        <!-- LEFT COLUMN: confession form -->
-        <div class="card">
-            <h2>✍️ Write your confession</h2>
+    <div class="dashboard">
+        <!-- LEFT: confession form & history -->
+        <div class="glass-card card-padding">
+            <h2>✍️ Share your truth</h2>
             <form id="confessionForm">
                 <div class="form-group">
-                    <label for="confessionText">What's on your mind?</label>
-                    <textarea id="confessionText" rows="5" placeholder="I feel lost in my career... / I need advice about a relationship... / I'm struggling with anxiety..." required></textarea>
+                    <textarea id="confessionText" rows="4" placeholder="I've been feeling... I need advice about..." required></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="category">Category (helps match you with experts)</label>
                     <select id="category">
                         <option value="mental health">🧠 Mental Health</option>
                         <option value="relationships">❤️ Relationships</option>
-                        <option value="career">💼 Career & Work</option>
+                        <option value="career">💼 Career</option>
                         <option value="finance">💰 Finance</option>
-                        <option value="health">🏥 Physical Health</option>
+                        <option value="health">🏥 Health</option>
                         <option value="other">🌟 Other</option>
                     </select>
                 </div>
@@ -257,165 +304,161 @@
                     <input type="checkbox" id="anonymousCheckbox">
                     <label for="anonymousCheckbox">Post anonymously (no name stored)</label>
                 </div>
-                <button type="submit">💬 Submit & get AI advice</button>
+                <button type="submit" id="submitBtn">💬 Submit & receive AI advice</button>
             </form>
+
+            <hr style="margin: 1.5rem 0; border-color: #cbdbe6;">
+
+            <h2>📜 Your past confessions</h2>
+            <div id="historyList" class="confession-history">
+                <p style="color:#5f7f9f;">No confessions yet. Your journey starts here.</p>
+            </div>
+            <button id="clearHistoryBtn" class="secondary-btn" style="margin-top: 0.8rem;">🗑️ Clear history</button>
         </div>
 
-        <!-- RIGHT COLUMN: AI advice preview -->
-        <div class="card">
-            <h2>🤖 AI advice</h2>
-            <div id="aiAdviceContainer">
-                <p style="color:#64748b;">Your compassionate AI guidance will appear here after you submit a confession.</p>
-            </div>
-            <hr>
-            <h2>👥 Advice from human experts</h2>
-            <div id="humanAdviceSection">
-                <p style="color:#64748b;">Select a sector below to see genuine advice from professionals in that field.</p>
-                <div class="sector-buttons" id="sectorButtons">
-                    <button class="sector-btn" data-sector="mental health">🧠 Mental Health</button>
-                    <button class="sector-btn" data-sector="relationships">❤️ Relationships</button>
-                    <button class="sector-btn" data-sector="career">💼 Career</button>
-                    <button class="sector-btn" data-sector="finance">💰 Finance</button>
-                    <button class="sector-btn" data-sector="health">🏥 Health</button>
-                </div>
-                <div id="expertAdviceDisplay" class="advice-box" style="background:#fff;">
-                    <div class="advice-text">Click any sector to see tailored advice from our verified experts.</div>
-                    <div class="advice-meta"><span>⭐ Genuine guidance</span></div>
+        <!-- RIGHT: AI + expert advice -->
+        <div>
+            <!-- AI Advice Section -->
+            <div class="glass-card card-padding" style="margin-bottom: 1.8rem;">
+                <h2>🤖 AI‑powered guidance</h2>
+                <div id="aiAdviceContainer">
+                    <div class="advice-card">
+                        <div class="advice-text">✨ Submit a confession to receive thoughtful, compassionate AI advice.</div>
+                        <div class="advice-meta"><span>Always free • always kind</span></div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- extra: recently shown confession (optional) -->
-    <div class="card" style="margin-top: 1rem;">
-        <h2>📌 Latest confession (your submission)</h2>
-        <div id="latestConfessionDisplay" style="background:#f1f5f9; padding:1rem; border-radius: 16px; color:#334155;">
-            No confession submitted yet.
+            <!-- Human Expert Section -->
+            <div class="glass-card card-padding">
+                <h2>👥 Advice from verified experts</h2>
+                <div class="sector-pills" id="sectorPills">
+                    <button class="pill" data-sector="mental health">🧠 Mental Health</button>
+                    <button class="pill" data-sector="relationships">❤️ Relationships</button>
+                    <button class="pill" data-sector="career">💼 Career</button>
+                    <button class="pill" data-sector="finance">💰 Finance</button>
+                    <button class="pill" data-sector="health">🏥 Health</button>
+                </div>
+                <div id="expertAdviceDisplay">
+                    <div class="advice-card">
+                        <div class="advice-text">Click any sector to see genuine advice from a trusted professional.</div>
+                    </div>
+                </div>
+                <p style="font-size: 0.7rem; margin-top: 0.8rem; color:#5e7c9e;">⭐ Every expert is vetted for authenticity. Your feedback helps maintain quality.</p>
+            </div>
         </div>
     </div>
 
     <footer>
-        ⚡ Genuine advice only • AI trained to be supportive • Human experts from various sectors are reviewed for authenticity • Always free & anonymous
+        🕊️ Genuine advice only. Your confessions are stored locally for your privacy. AI advice is simulation, not a replacement for professional help.
     </footer>
 </div>
+<div id="toastMessage" class="toast"></div>
 
 <script>
-    // ---------- Mock AI advice generator (simulates LLM response) ----------
-    function generateAIAdvice(confessionText, category) {
-        // Simulate realistic, empathetic advice based on keywords & category
-        const lowerText = confessionText.toLowerCase();
+    // ---------- Data Layer: Store confessions in localStorage ----------
+    let confessions = [];
+
+    function loadConfessions() {
+        const stored = localStorage.getItem("whisper_confessions");
+        if (stored) {
+            try {
+                confessions = JSON.parse(stored);
+            } catch(e) { confessions = []; }
+        } else {
+            confessions = [];
+        }
+        renderHistory();
+    }
+
+    function saveConfessions() {
+        localStorage.setItem("whisper_confessions", JSON.stringify(confessions));
+    }
+
+    function addConfession(confession) {
+        confessions.unshift(confession); // newest first
+        saveConfessions();
+        renderHistory();
+    }
+
+    function clearHistory() {
+        if (confirm("Delete all your past confessions? This cannot be undone.")) {
+            confessions = [];
+            saveConfessions();
+            renderHistory();
+            showToast("History cleared.");
+        }
+    }
+
+    function renderHistory() {
+        const historyDiv = document.getElementById("historyList");
+        if (!confessions.length) {
+            historyDiv.innerHTML = `<p style="color:#5f7f9f;">No confessions yet. Your journey starts here.</p>`;
+            return;
+        }
+        historyDiv.innerHTML = confessions.map((conf, idx) => `
+            <div class="history-item" data-index="${idx}">
+                <div><strong>${conf.anonymous ? "Anonymous" : "You"}</strong> · ${conf.category}</div>
+                <div style="font-size:0.85rem;">"${conf.text.substring(0, 100)}${conf.text.length > 100 ? '…' : ''}"</div>
+                <div class="timestamp">${new Date(conf.timestamp).toLocaleString()}</div>
+            </div>
+        `).join('');
+        // attach click event to load confession into form
+        document.querySelectorAll('.history-item').forEach(el => {
+            el.addEventListener('click', (e) => {
+                const idx = el.getAttribute('data-index');
+                if (idx !== null) {
+                    const conf = confessions[parseInt(idx)];
+                    document.getElementById("confessionText").value = conf.text;
+                    document.getElementById("category").value = conf.category;
+                    document.getElementById("anonymousCheckbox").checked = conf.anonymous;
+                    showToast("Loaded previous confession. Edit & resubmit for new advice.");
+                }
+            });
+        });
+    }
+
+    // ---------- AI Advice Generation (Enhanced, Context-Aware) ----------
+    function generateAIAdvice(text, category) {
+        const lower = text.toLowerCase();
         let advice = "";
-
-        if (category === "mental health" || lowerText.includes("anxiety") || lowerText.includes("depression") || lowerText.includes("stressed")) {
-            advice = "It takes courage to share what you're going through. Your feelings are valid. Consider small steps: deep breathing, journaling, or reaching out to a counselor. You are not alone. 💙";
-        } else if (category === "relationships" || lowerText.includes("partner") || lowerText.includes("friend") || lowerText.includes("lonely")) {
-            advice = "Relationships can be complex. Communication is key — try expressing your needs calmly. Remember, healthy boundaries protect your wellbeing. You deserve respect and understanding.";
-        } else if (category === "career" || lowerText.includes("job") || lowerText.includes("work") || lowerText.includes("boss")) {
-            advice = "Career crossroads are tough. Reflect on what truly matters to you. Sometimes a small pivot or learning a new skill can open doors. Don't hesitate to seek mentorship — your growth matters.";
-        } else if (category === "finance" || lowerText.includes("money") || lowerText.includes("debt") || lowerText.includes("saving")) {
-            advice = "Financial stress is real, but there are ways to regain control. Start with a simple budget, prioritize essentials, and explore free financial literacy resources. Progress, not perfection.";
+        // nuanced detection
+        if (lower.includes("suicidal") || lower.includes("want to die") || lower.includes("end it")) {
+            advice = "⚠️ If you're thinking about hurting yourself, please reach out to a crisis helpline immediately. You are valuable, and support is available. In the US: 988 Suicide & Crisis Lifeline. Your feelings are serious — please talk to someone now.";
+        } else if (category === "mental health" || lower.includes("anxiety") || lower.includes("depression") || lower.includes("panic")) {
+            advice = "It takes great strength to open up about your mental health. Small steps matter: grounding exercises, talking to a trusted person, or seeking professional support. You deserve peace, and it's okay to not be okay. 💙";
+        } else if (category === "relationships" || lower.includes("partner") || lower.includes("friend") || lower.includes("breakup")) {
+            advice = "Relationships shape us deeply. Honest communication, setting boundaries, and self‑respect are pillars of healthy connections. Give yourself grace — healing takes time, and your needs are valid.";
+        } else if (category === "career" || lower.includes("job") || lower.includes("work") || lower.includes("burnout")) {
+            advice = "Career crossroads are rarely easy. Reflect on what energizes you. Sometimes a small shift or learning a new skill can open doors. Remember: your well‑being is more important than any job title.";
+        } else if (category === "finance" || lower.includes("money") || lower.includes("debt") || lower.includes("bills")) {
+            advice = "Financial stress can feel overwhelming. Start with tiny steps: track expenses, celebrate small wins, and know that many have rebuilt from difficult times. Free resources like financial counseling can help.";
+        } else if (category === "health" || lower.includes("sick") || lower.includes("pain") || lower.includes("diagnosis")) {
+            advice = "Your health is your foundation. Listen to your body, ask questions to medical professionals, and lean on your support system. Taking proactive care is an act of self‑love.";
         } else {
-            advice = "Thank you for trusting us with your thoughts. Every challenge holds a lesson. Take one small step forward today, and remember that seeking support is a sign of strength. ✨";
+            advice = "Thank you for sharing. Every confession is a step toward clarity. I'm here to offer a non‑judgmental space. What you're feeling matters, and reaching out is a sign of courage. ✨";
         }
-
-        // add personal touch
-        return `🤗 ${advice} (This AI advice is generated with empathy and factual care.)`;
+        return `🤗 ${advice} (This AI advice is generated with empathy; for serious concerns, always consult a professional.)`;
     }
 
-    // ---------- Mock human experts per sector (genuine advice) ----------
-    const expertAdviceDB = {
-        "mental health": {
-            name: "Dr. Aisha K., Licensed Psychologist",
-            advice: "It's essential to acknowledge your emotions without judgment. If you're experiencing persistent sadness or anxiety, consider speaking with a therapist. Self‑care is not selfish; it's survival."
-        },
-        "relationships": {
-            name: "Mariana L., Relationship Coach",
-            advice: "Healthy relationships thrive on mutual respect and open dialogue. If you feel unheard, try using 'I' statements to express your needs. And remember: your boundaries are your superpower."
-        },
-        "career": {
-            name: "James O., Career Strategist",
-            advice: "Feeling stuck in your career is more common than you think. Reflect on your values and strengths. Sometimes a side project or a networking conversation can spark new clarity."
-        },
-        "finance": {
-            name: "Elena R., Certified Financial Planner",
-            advice: "Financial freedom starts with knowledge. Create a simple spending plan, build an emergency fund little by little, and avoid comparing your journey to others. Consistency wins."
-        },
-        "health": {
-            name: "Dr. Marcus T., General Practitioner",
-            advice: "Physical health and mental well‑being are connected. Prioritize sleep, hydration, and movement. If something feels off, don't hesitate to consult a healthcare professional — early action matters."
-        }
-    };
-
-    // current active sector (default mental health)
-    let activeSector = "mental health";
-    let currentConfession = null;
-
-    // Function to render expert advice based on active sector
-    function renderExpertAdvice() {
-        const expert = expertAdviceDB[activeSector];
-        if (expert) {
-            const adviceHtml = `
-                <div class="advice-text"><strong>${expert.name}</strong><br>${expert.advice}</div>
-                <div class="advice-meta">
-                    <span>✅ Verified expert • Sector: ${activeSector}</span>
-                    <div class="rating" data-advice-type="expert" data-sector="${activeSector}">
-                        <span class="rate-helpful">👍 Helpful</span>
-                        <span class="rate-unhelpful">👎 Not helpful</span>
-                    </div>
-                </div>
-            `;
-            document.getElementById("expertAdviceDisplay").innerHTML = adviceHtml;
-
-            // attach rating events for expert advice
-            attachRatingEvents();
-        } else {
-            document.getElementById("expertAdviceDisplay").innerHTML = `<div class="advice-text">No expert available for this sector yet.</div>`;
-        }
+    function showAILoading() {
+        document.getElementById("aiAdviceContainer").innerHTML = `
+            <div class="advice-card">
+                <div class="advice-text" style="opacity:0.7;">🌀 Crafting compassionate advice...</div>
+            </div>
+        `;
     }
 
-    // attach rating events to dynamically created rating buttons
-    function attachRatingEvents() {
-        const helpfulBtns = document.querySelectorAll(".rate-helpful");
-        const unhelpfulBtns = document.querySelectorAll(".rate-unhelpful");
-
-        helpfulBtns.forEach(btn => {
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                alert("⭐ Thank you! Your feedback helps us maintain genuine advice quality.");
-                // In a real app, this would update reputation scores & analytics
-            };
-        });
-        unhelpfulBtns.forEach(btn => {
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                alert("🙏 We're sorry this advice wasn't helpful. We'll work on improving matches.");
-            };
-        });
-    }
-
-    // handle AI advice rating (from AI section)
-    function attachAIRating() {
-        const aiHelpful = document.getElementById("aiRateHelpful");
-        const aiUnhelpful = document.getElementById("aiRateUnhelpful");
-        if (aiHelpful) {
-            aiHelpful.onclick = () => alert("👍 Thanks for rating AI advice – your feedback improves our system.");
-        }
-        if (aiUnhelpful) {
-            aiUnhelpful.onclick = () => alert("👎 Noted! We'll refine the AI advice model.");
-        }
-    }
-
-    // display AI advice with rating
     function displayAIAdvice(adviceText) {
         const container = document.getElementById("aiAdviceContainer");
         container.innerHTML = `
-            <div class="advice-box">
+            <div class="advice-card">
                 <div class="advice-text">${adviceText}</div>
                 <div class="advice-meta">
-                    <span>🤖 AI‑powered • instant guidance</span>
-                    <div class="rating">
-                        <span id="aiRateHelpful">👍 Helpful</span>
-                        <span id="aiRateUnhelpful">👎 Not helpful</span>
+                    <span>🤖 AI • instant guidance</span>
+                    <div class="rating-buttons" data-advice-type="ai">
+                        <span class="rate-ai-helpful">👍 Helpful</span>
+                        <span class="rate-ai-unhelpful">👎 Not helpful</span>
                     </div>
                 </div>
             </div>
@@ -423,62 +466,103 @@
         attachAIRating();
     }
 
-    // show loading state for AI
-    function showAILoading() {
-        document.getElementById("aiAdviceContainer").innerHTML = `<div class="loading">🤔 Generating compassionate AI advice...</div>`;
+    function attachAIRating() {
+        const helpful = document.querySelector('.rate-ai-helpful');
+        const unhelpful = document.querySelector('.rate-ai-unhelpful');
+        if (helpful) helpful.onclick = () => showToast("Thanks! Your feedback improves our AI.");
+        if (unhelpful) unhelpful.onclick = () => showToast("Noted. We're working to make advice better.");
     }
 
-    // handle confession submission
+    // ---------- Expert advice (dynamic, with rating) ----------
+    const expertDB = {
+        "mental health": { name: "Dr. Amara Chen, Clinical Psychologist", advice: "Your emotional health is paramount. If you're feeling overwhelmed, try the 5-4-3-2-1 grounding technique. Therapy is a sign of strength — there's no shame in seeking support." },
+        "relationships": { name: "Luis M., Certified Relationship Coach", advice: "Healthy relationships require mutual respect and communication. If you're feeling unheard, consider writing a letter to express your needs. Boundaries protect your heart." },
+        "career": { name: "Priya K., Career Strategist & Mentor", advice: "Feeling stuck? Audit your skills and passions. Sometimes a lateral move or upskilling reignites purpose. Network genuinely — opportunities often come from unexpected connections." },
+        "finance": { name: "Omar F., CFP®", advice: "Financial peace is a marathon. Automate small savings, tackle high‑interest debt first, and avoid comparison. You are more than your net worth." },
+        "health": { name: "Dr. Elena Vasquez, MD", advice: "Physical and mental wellness are intertwined. Prioritize sleep, hydration, and regular check‑ups. If something feels off, trust your intuition and see a doctor." }
+    };
+
+    let activeSector = "mental health";
+
+    function renderExpertAdvice() {
+        const expert = expertDB[activeSector];
+        const adviceHtml = `
+            <div class="advice-card">
+                <div class="advice-text"><strong>${expert.name}</strong><br>${expert.advice}</div>
+                <div class="advice-meta">
+                    <span>✅ Verified expert • ${activeSector}</span>
+                    <div class="rating-buttons" data-sector="${activeSector}">
+                        <span class="rate-expert-helpful">👍 Helpful</span>
+                        <span class="rate-expert-unhelpful">👎 Not helpful</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById("expertAdviceDisplay").innerHTML = adviceHtml;
+        attachExpertRating();
+    }
+
+    function attachExpertRating() {
+        const helpful = document.querySelector('.rate-expert-helpful');
+        const unhelpful = document.querySelector('.rate-expert-unhelpful');
+        if (helpful) helpful.onclick = () => showToast("⭐ Thank you! Expert reputation updated.");
+        if (unhelpful) unhelpful.onclick = () => showToast("🙏 Feedback recorded. We'll improve expert matching.");
+    }
+
+    // ---------- Toast notification ----------
+    let toastTimeout;
+    function showToast(msg) {
+        const toast = document.getElementById("toastMessage");
+        toast.textContent = msg;
+        toast.style.opacity = "1";
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+            toast.style.opacity = "0";
+        }, 2500);
+    }
+
+    // ---------- Form submission ----------
     async function handleSubmit(event) {
         event.preventDefault();
-        const confessionText = document.getElementById("confessionText").value.trim();
-        if (!confessionText) {
-            alert("Please write your confession before submitting.");
+        const text = document.getElementById("confessionText").value.trim();
+        if (!text) {
+            showToast("Please write your confession before submitting.");
             return;
         }
         const category = document.getElementById("category").value;
-        const isAnonymous = document.getElementById("anonymousCheckbox").checked;
+        const anonymous = document.getElementById("anonymousCheckbox").checked;
 
-        // store current confession for display
-        currentConfession = {
-            text: confessionText,
+        const newConfession = {
+            id: Date.now(),
+            text: text,
             category: category,
-            anonymous: isAnonymous,
-            timestamp: new Date().toLocaleString()
+            anonymous: anonymous,
+            timestamp: new Date().toISOString()
         };
+        addConfession(newConfession);
 
-        // update latest confession display
-        const displayName = isAnonymous ? "Anonymous" : "You";
-        document.getElementById("latestConfessionDisplay").innerHTML = `
-            <strong>${displayName} shared (${category}):</strong><br>
-            "${confessionText.substring(0, 200)}${confessionText.length > 200 ? '...' : ''}"<br>
-            <small>${currentConfession.timestamp}</small>
-        `;
-
-        // show loading for AI
+        // Show AI advice loading
         showAILoading();
 
-        // simulate AI generation delay (real API would be async)
+        // Simulate AI generation delay
         setTimeout(() => {
-            const aiAdvice = generateAIAdvice(confessionText, category);
+            const aiAdvice = generateAIAdvice(text, category);
             displayAIAdvice(aiAdvice);
-        }, 500); // artificial delay for realism
+        }, 400);
 
-        // optional: you could also refresh expert advice based on category
-        // but we keep expert sector buttons independent for user exploration
-        // automatically highlight the matching sector button for better UX
-        const matchingBtn = document.querySelector(`.sector-btn[data-sector="${category}"]`);
-        if (matchingBtn) {
-            // if category matches one of our sectors, highlight it and update active sector
+        // Auto switch expert sector to match category if it's one of the existing ones
+        if (expertDB[category]) {
             setActiveSector(category);
         }
+
+        // Clear form but keep text? optional: keep for editing
+        // we keep text but user can clear manually
+        showToast("Confession saved. AI advice generated.");
     }
 
-    // set active sector and update expert advice
     function setActiveSector(sector) {
         activeSector = sector;
-        // update active class on buttons
-        document.querySelectorAll(".sector-btn").forEach(btn => {
+        document.querySelectorAll(".pill").forEach(btn => {
             if (btn.getAttribute("data-sector") === sector) {
                 btn.classList.add("active");
             } else {
@@ -488,27 +572,29 @@
         renderExpertAdvice();
     }
 
-    // initialize event listeners
+    // ---------- Initialize UI & event listeners ----------
     function init() {
+        loadConfessions();
+
         const form = document.getElementById("confessionForm");
         form.addEventListener("submit", handleSubmit);
 
-        // sector buttons click
-        const sectorBtns = document.querySelectorAll(".sector-btn");
+        document.getElementById("clearHistoryBtn").addEventListener("click", clearHistory);
+
+        const sectorBtns = document.querySelectorAll(".pill");
         sectorBtns.forEach(btn => {
-            btn.addEventListener("click", (e) => {
+            btn.addEventListener("click", () => {
                 const sector = btn.getAttribute("data-sector");
                 setActiveSector(sector);
             });
         });
 
-        // default sector: mental health active
+        // default sector active
         setActiveSector("mental health");
-        // add AI initial placeholder (no rating yet)
-        attachAIRating(); // placeholder for existing (no actual rating yet)
+        // default AI placeholder
+        displayAIAdvice("✨ Submit a confession to receive thoughtful, compassionate AI advice.");
     }
 
-    // run init on page load
     init();
 </script>
 </body>
