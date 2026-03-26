@@ -53,7 +53,7 @@
             color: transparent;
         }
         .logo p { font-size: 0.9rem; opacity: 0.8; }
-        .theme-toggle, .auth-btn {
+        .theme-toggle, .dashboard-btn {
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: 2rem;
@@ -151,6 +151,7 @@
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
+            margin-bottom: 1rem;
         }
         .filter-chip, .trending-chip {
             background: var(--bg);
@@ -163,6 +164,10 @@
         .filter-chip.active, .trending-chip.active {
             background: var(--primary);
             color: white;
+        }
+        .confession-feed {
+            max-height: 500px;
+            overflow-y: auto;
         }
         .confession-item {
             border-bottom: 1px solid var(--border);
@@ -190,7 +195,6 @@
             padding: 0.2rem 0.5rem;
             border-radius: 1rem;
         }
-        .expired-badge { background: var(--danger); }
         .like-btn { cursor: pointer; color: var(--danger); }
         .like-btn.liked { color: var(--danger); opacity: 1; }
 
@@ -255,7 +259,7 @@
                 <i class="fas fa-bell"></i>
                 <span id="notificationCount" class="notification-count" style="display:none;">0</span>
             </div>
-            <button class="auth-btn" id="authBtn">Sign In</button>
+            <button class="dashboard-btn" id="dashboardBtn"><i class="fas fa-user"></i> My Stuff</button>
             <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
         </div>
     </div>
@@ -300,7 +304,7 @@
                 <button class="trending-chip" data-trend="trending">🔥 Trending (most advice)</button>
                 <button class="trending-chip" data-trend="most-liked">❤️ Most liked</button>
             </div>
-            <div id="publicFeed" class="confession-feed" style="max-height: 500px; overflow-y: auto;">Loading...</div>
+            <div id="publicFeed" class="confession-feed">Loading...</div>
         </div>
 
         <div class="card">
@@ -340,7 +344,7 @@
     <div id="dashboardView" class="view">
         <div class="back-btn" id="backToFeedFromDashboard"><i class="fas fa-arrow-left"></i> Back</div>
         <div class="card">
-            <h2><i class="fas fa-user"></i> Your profile</h2>
+            <h2><i class="fas fa-user"></i> Your activity</h2>
             <div id="profileInfo"></div>
         </div>
         <div class="card">
@@ -360,17 +364,6 @@
             <div id="notificationsList"></div>
             <button id="clearNotifications" class="secondary-btn">Clear all</button>
             <button id="closeNotifications">Close</button>
-        </div>
-    </div>
-
-    <!-- Auth Modal -->
-    <div id="authModal" class="modal">
-        <div class="modal-content">
-            <h3 id="authTitle">Sign In / Sign Up</h3>
-            <input type="text" id="authUsername" placeholder="Username">
-            <input type="password" id="authPassword" placeholder="Password">
-            <button id="authSubmit">Sign In</button>
-            <p style="margin-top: 0.5rem; font-size:0.8rem;">Demo: use any username/password; account will be created.</p>
         </div>
     </div>
 
@@ -407,7 +400,6 @@
     // ---------- CONSTANTS ----------
     const EXPIRATION_MS = 48 * 60 * 60 * 1000;
     const stores = {
-        users: localforage.createInstance({ name: "whisper", storeName: "users" }),
         confessions: localforage.createInstance({ name: "whisper", storeName: "confessions" }),
         advice: localforage.createInstance({ name: "whisper", storeName: "advice" }),
         votes: localforage.createInstance({ name: "whisper", storeName: "votes" }),
@@ -416,7 +408,13 @@
         notifications: localforage.createInstance({ name: "whisper", storeName: "notifications" })
     };
 
-    let currentUser = null;
+    // Get or create a persistent user ID (no login)
+    let userId = localStorage.getItem('whisper_userId');
+    if (!userId) {
+        userId = 'user_' + Math.random().toString(36).substr(2, 10) + '_' + Date.now();
+        localStorage.setItem('whisper_userId', userId);
+    }
+
     let currentConfessionId = null;
     let currentEditConfessionId = null;
     let currentFilter = "all";
@@ -435,167 +433,130 @@
         setTimeout(() => toast.style.opacity = "0", 2500);
     }
 
-    // ---------- User authentication ----------
-    async function registerOrLogin(username, password) {
-        let user = await stores.users.getItem(username);
-        if (!user) {
-            user = { username, password, reputation: 0, createdAt: Date.now() };
-            await stores.users.setItem(username, user);
-            showToast("Account created! Welcome.");
-        } else if (user.password !== password) {
-            showToast("Wrong password.");
-            return null;
-        }
-        currentUser = user;
-        localStorage.setItem('currentUser', username);
-        document.getElementById("authBtn").innerHTML = `<i class="fas fa-user"></i> ${username} <i class="fas fa-chevron-down"></i>`;
-        document.getElementById("authBtn").onclick = () => showDashboard();
-        document.getElementById("authModal").classList.remove("active");
-        await loadUserData();
-        renderFeed();
-        return user;
-    }
-
-    function logout() {
-        currentUser = null;
-        localStorage.removeItem('currentUser');
-        document.getElementById("authBtn").innerHTML = "Sign In";
-        document.getElementById("authBtn").onclick = () => document.getElementById("authModal").classList.add("active");
-        renderFeed();
-    }
-
-    async function loadUserData() {
-        if (!currentUser) return;
-        // update reputation from votes
+    // ---------- User profile (reputation based on votes on their advice) ----------
+    async function getUserReputation() {
         let rep = 0;
         await stores.votes.iterate((vote) => {
-            if (vote.authorId === currentUser.username && vote.voteType === 'up') rep++;
-            else if (vote.authorId === currentUser.username && vote.voteType === 'down') rep--;
+            if (vote.targetAuthorId === userId && vote.voteType === 'up') rep++;
+            else if (vote.targetAuthorId === userId && vote.voteType === 'down') rep--;
         });
-        currentUser.reputation = rep;
-        await stores.users.setItem(currentUser.username, currentUser);
+        return rep;
+    }
+
+    async function updateProfileDisplay() {
+        const rep = await getUserReputation();
         document.getElementById("profileInfo").innerHTML = `
-            <p><strong>Username:</strong> ${currentUser.username}</p>
-            <p><strong>Reputation:</strong> ${currentUser.reputation} points</p>
-            <button id="logoutBtn" class="secondary-btn">Logout</button>
+            <p><strong>Your ID:</strong> ${userId.substring(0, 12)}...</p>
+            <p><strong>Reputation:</strong> ${rep} points (from advice upvotes/downvotes)</p>
         `;
-        document.getElementById("logoutBtn")?.addEventListener("click", logout);
     }
 
-    function showDashboard() {
-        if (!currentUser) { showToast("Please sign in first"); return; }
-        loadUserData();
-        renderMyConfessions();
-        renderMyAdvice();
-        document.getElementById("feedView").classList.remove("active");
-        document.getElementById("detailView").classList.remove("active");
-        document.getElementById("dashboardView").classList.add("active");
+    // ---------- Data operations ----------
+    async function saveConfession(confession) {
+        await stores.confessions.setItem(confession.id, confession);
+        return confession;
     }
 
-    async function renderMyConfessions() {
-        const myConfs = [];
+    async function getPublicConfessions() {
+        const confs = [];
+        const now = Date.now();
         await stores.confessions.iterate((conf) => {
-            if (conf.userId === currentUser.username && !conf.deleted && (Date.now() - conf.timestamp < EXPIRATION_MS)) {
-                myConfs.push(conf);
+            if (conf.isPublic && !conf.deleted && (now - conf.timestamp < EXPIRATION_MS)) confs.push(conf);
+        });
+        return confs;
+    }
+
+    async function getConfessionById(id) {
+        const confession = await stores.confessions.getItem(id);
+        if (!confession || (Date.now() - confession.timestamp >= EXPIRATION_MS)) return null;
+        return confession;
+    }
+
+    async function saveAdvice(advice) {
+        await stores.advice.setItem(advice.id, advice);
+        return advice;
+    }
+
+    async function getAdviceByConfession(confessionId) {
+        const list = [];
+        await stores.advice.iterate((value) => {
+            if (value.confessionId === confessionId && !value.deleted && !value.reported) list.push(value);
+        });
+        return list.sort((a,b) => b.timestamp - a.timestamp);
+    }
+
+    async function getAdviceVoteCount(adviceId) {
+        let up = 0, down = 0;
+        await stores.votes.iterate((vote) => {
+            if (vote.adviceId === adviceId) {
+                if (vote.voteType === 'up') up++;
+                else if (vote.voteType === 'down') down++;
             }
         });
-        myConfs.sort((a,b)=>b.timestamp-a.timestamp);
-        if (myConfs.length === 0) {
-            document.getElementById("myConfessions").innerHTML = "<p>You haven't posted any confessions.</p>";
-            return;
-        }
-        let html = '';
-        for (const conf of myConfs) {
-            const remaining = getRemainingTime(conf.timestamp);
-            html += `
-                <div class="confession-item" style="margin-bottom:1rem;">
-                    <div><strong>${conf.anonymous ? 'Anonymous' : 'You'}</strong> · ${conf.category}</div>
-                    <div>${conf.text.substring(0,100)}${conf.text.length>100?'…':''}</div>
-                    <div class="timestamp">${new Date(conf.timestamp).toLocaleString()} · <span class="expiry-badge">${remaining}</span></div>
-                    <div style="margin-top:0.5rem;">
-                        <button class="secondary-btn edit-confession" data-id="${conf.id}">Edit</button>
-                        <button class="danger-btn delete-confession" data-id="${conf.id}">Delete</button>
-                    </div>
-                </div>
-            `;
-        }
-        document.getElementById("myConfessions").innerHTML = html;
-        document.querySelectorAll('.edit-confession').forEach(btn => {
-            btn.addEventListener('click', () => openEditConfession(btn.getAttribute('data-id')));
-        });
-        document.querySelectorAll('.delete-confession').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                if (confirm("Delete this confession? All advice will also be removed.")) {
-                    const id = btn.getAttribute('data-id');
-                    const conf = await stores.confessions.getItem(id);
-                    if (conf && conf.userId === currentUser.username) {
-                        conf.deleted = true;
-                        await stores.confessions.setItem(id, conf);
-                        // also delete all advice for this confession
-                        await stores.advice.iterate((adv, key) => {
-                            if (adv.confessionId === id) stores.advice.removeItem(key);
-                        });
-                        showToast("Confession deleted.");
-                        renderMyConfessions();
-                        renderFeed();
-                    }
-                }
+        return { up, down, score: up - down };
+    }
+
+    async function setVote(adviceId, voteType) {
+        const key = `${adviceId}_${userId}`;
+        const existing = await stores.votes.getItem(key);
+        if (existing && existing.voteType === voteType) {
+            await stores.votes.removeItem(key);
+        } else {
+            // remove opposite vote if exists
+            if (existing) await stores.votes.removeItem(key);
+            const advice = await stores.advice.getItem(adviceId);
+            await stores.votes.setItem(key, {
+                adviceId, userId, voteType, targetAuthorId: advice?.userId, timestamp: Date.now()
             });
-        });
-    }
-
-    async function renderMyAdvice() {
-        const myAdv = [];
-        await stores.advice.iterate((adv) => {
-            if (adv.userId === currentUser.username && !adv.deleted) myAdv.push(adv);
-        });
-        myAdv.sort((a,b)=>b.timestamp-a.timestamp);
-        if (myAdv.length === 0) {
-            document.getElementById("myAdvice").innerHTML = "<p>You haven't posted any advice.</p>";
-            return;
         }
-        let html = '';
-        for (const adv of myAdv) {
-            const confession = await stores.confessions.getItem(adv.confessionId);
-            const votes = await getAdviceVoteCount(adv.id);
-            html += `
-                <div class="advice-item" style="margin-bottom:1rem;">
-                    <div><strong>To:</strong> ${confession ? (confession.anonymous ? 'Anonymous' : 'Someone') : 'Unknown'} (${adv.confessionId.substring(0,6)})</div>
-                    <div>${adv.content.substring(0,100)}${adv.content.length>100?'…':''}</div>
-                    <div class="advice-meta">👍 ${votes.score} points · ${new Date(adv.timestamp).toLocaleString()}</div>
-                    <button class="danger-btn delete-advice" data-id="${adv.id}">Delete</button>
-                </div>
-            `;
+        // Update reputation (no need to recalc here, just refresh later)
+    }
+
+    async function likeConfession(confessionId) {
+        const key = `${confessionId}_${userId}`;
+        const existing = await stores.likes.getItem(key);
+        if (existing) {
+            await stores.likes.removeItem(key);
+            return false;
+        } else {
+            await stores.likes.setItem(key, { confessionId, userId, timestamp: Date.now() });
+            return true;
         }
-        document.getElementById("myAdvice").innerHTML = html;
-        document.querySelectorAll('.delete-advice').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const id = btn.getAttribute('data-id');
-                const adv = await stores.advice.getItem(id);
-                if (adv && adv.userId === currentUser.username) {
-                    adv.deleted = true;
-                    await stores.advice.setItem(id, adv);
-                    showToast("Advice deleted.");
-                    renderMyAdvice();
-                    if (currentConfessionId) await showConfessionDetail(currentConfessionId);
-                    renderFeed();
-                }
-            });
-        });
     }
 
-    // ---------- Confession expiration ----------
-    function getRemainingTime(timestamp) {
-        const elapsed = Date.now() - timestamp;
-        const remaining = EXPIRATION_MS - elapsed;
-        if (remaining <= 0) return "Expired";
-        const hours = Math.floor(remaining / (1000 * 60 * 60));
-        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-        if (hours > 0) return `${hours}h ${minutes}m left`;
-        return `${minutes}m left`;
+    async function getConfessionLikes(confessionId) {
+        let count = 0;
+        await stores.likes.iterate((like) => { if (like.confessionId === confessionId) count++; });
+        return count;
     }
 
-    // ---------- AI advice ----------
+    async function reportAdvice(adviceId) {
+        const key = `${adviceId}_${userId}`;
+        const existing = await stores.reports.getItem(key);
+        if (existing) return;
+        await stores.reports.setItem(key, { adviceId, userId, timestamp: Date.now() });
+        const advice = await stores.advice.getItem(adviceId);
+        if (advice) {
+            advice.reported = true;
+            await stores.advice.setItem(adviceId, advice);
+        }
+    }
+
+    // Add notification (for when someone replies to your confession)
+    async function addNotification(recipientUserId, message, relatedId) {
+        const notif = {
+            id: uid(),
+            userId: recipientUserId,
+            message,
+            relatedId,
+            read: false,
+            timestamp: Date.now()
+        };
+        await stores.notifications.setItem(notif.id, notif);
+        checkNotifications();
+    }
+
+    // ---------- AI advice generator ----------
     function generateAIAdvice(text, category) {
         const lower = text.toLowerCase();
         if (lower.includes("suicidal") || lower.includes("kill myself") || lower.includes("end it")) {
@@ -636,66 +597,14 @@
         document.querySelector('.expert-downvote')?.addEventListener('click', () => showToast("Feedback recorded."));
     }
 
-    // ---------- Voting & likes ----------
-    async function getAdviceVoteCount(adviceId) {
-        let up = 0, down = 0;
-        await stores.votes.iterate((vote) => {
-            if (vote.adviceId === adviceId) {
-                if (vote.voteType === 'up') up++;
-                else if (vote.voteType === 'down') down++;
-            }
-        });
-        return { up, down, score: up - down };
-    }
-    async function setVote(adviceId, voteType) {
-        const key = `${adviceId}_${currentUser?.username || 'anon'}`;
-        const existing = await stores.votes.getItem(key);
-        if (existing && existing.voteType === voteType) {
-            await stores.votes.removeItem(key);
-        } else {
-            await stores.votes.setItem(key, { adviceId, userId: currentUser?.username, voteType, authorId: null });
-            // update reputation of advice author
-            const advice = await stores.advice.getItem(adviceId);
-            if (advice && advice.userId) {
-                const author = await stores.users.getItem(advice.userId);
-                if (author) {
-                    if (voteType === 'up') author.reputation = (author.reputation || 0) + 1;
-                    else if (voteType === 'down') author.reputation = (author.reputation || 0) - 1;
-                    await stores.users.setItem(author.username, author);
-                    if (currentUser?.username === author.username) currentUser.reputation = author.reputation;
-                }
-            }
-        }
-    }
-
-    async function likeConfession(confessionId) {
-        if (!currentUser) { showToast("Sign in to like"); return false; }
-        const key = `${confessionId}_${currentUser.username}`;
-        const existing = await stores.likes.getItem(key);
-        if (existing) {
-            await stores.likes.removeItem(key);
-            return false;
-        } else {
-            await stores.likes.setItem(key, { confessionId, userId: currentUser.username });
-            return true;
-        }
-    }
-    async function getConfessionLikes(confessionId) {
-        let count = 0;
-        await stores.likes.iterate((like) => { if (like.confessionId === confessionId) count++; });
-        return count;
-    }
-
     // ---------- Feed rendering ----------
     async function renderFeed() {
-        const confessions = [];
-        const now = Date.now();
-        await stores.confessions.iterate((conf) => {
-            if (conf.isPublic && !conf.deleted && (now - conf.timestamp < EXPIRATION_MS)) confessions.push(conf);
-        });
+        let confessions = await getPublicConfessions();
         let filtered = confessions;
         if (currentFilter !== "all") filtered = filtered.filter(c => c.category === currentFilter);
         if (currentSearch) filtered = filtered.filter(c => c.text.toLowerCase().includes(currentSearch.toLowerCase()));
+
+        // Trending sorting
         if (currentTrend === "trending") {
             const adviceCounts = {};
             await stores.advice.iterate((adv) => { if (!adv.deleted && !adv.reported) adviceCounts[adv.confessionId] = (adviceCounts[adv.confessionId] || 0) + 1; });
@@ -712,12 +621,13 @@
             document.getElementById("publicFeed").innerHTML = "<p>No confessions found.</p>";
             return;
         }
+
         let html = '';
         for (const conf of filtered) {
             const adviceList = await getAdviceByConfession(conf.id);
             const adviceCount = adviceList.length;
             const likes = await getConfessionLikes(conf.id);
-            const userLiked = currentUser ? (await stores.likes.getItem(`${conf.id}_${currentUser.username}`)) : false;
+            const userLiked = await stores.likes.getItem(`${conf.id}_${userId}`);
             const remaining = getRemainingTime(conf.timestamp);
             html += `
                 <div class="confession-item" data-id="${conf.id}">
@@ -736,6 +646,8 @@
             `;
         }
         document.getElementById("publicFeed").innerHTML = html;
+
+        // Attach event listeners
         document.querySelectorAll('.confession-item').forEach(el => {
             el.addEventListener('click', (e) => {
                 if (e.target.classList.contains('reply-btn') || e.target.classList.contains('like-btn')) return;
@@ -758,10 +670,10 @@
         });
     }
 
-    // ---------- Confession detail ----------
+    // ---------- Confession detail view ----------
     async function showConfessionDetail(confessionId) {
-        const confession = await stores.confessions.getItem(confessionId);
-        if (!confession || (Date.now() - confession.timestamp >= EXPIRATION_MS)) {
+        const confession = await getConfessionById(confessionId);
+        if (!confession) {
             showToast("Confession expired or not found");
             document.getElementById("backToFeed").click();
             return;
@@ -770,7 +682,7 @@
         document.getElementById("detailTitle").innerHTML = `Confession · ${confession.anonymous ? 'Anonymous' : 'Someone'}`;
         const remaining = getRemainingTime(confession.timestamp);
         let actions = '';
-        if (currentUser && confession.userId === currentUser.username) {
+        if (confession.userId === userId) {
             actions = `<button id="editConfessionBtn" class="secondary-btn">Edit</button>
                        <button id="deleteConfessionBtn" class="danger-btn">Delete</button>`;
         }
@@ -780,22 +692,27 @@
             <div class="timestamp">${new Date(confession.timestamp).toLocaleString()} · <span class="expiry-badge">${remaining}</span></div>
             <div>${actions}</div>
         `;
-        if (currentUser && confession.userId === currentUser.username) {
+        if (confession.userId === userId) {
             document.getElementById("editConfessionBtn")?.addEventListener("click", () => openEditConfession(confessionId));
             document.getElementById("deleteConfessionBtn")?.addEventListener("click", async () => {
                 if (confirm("Delete this confession? All advice will also be removed.")) {
                     confession.deleted = true;
                     await stores.confessions.setItem(confessionId, confession);
-                    await stores.advice.iterate((adv, key) => { if (adv.confessionId === confessionId) stores.advice.removeItem(key); });
+                    // delete all advice for this confession
+                    await stores.advice.iterate((adv, key) => {
+                        if (adv.confessionId === confessionId) stores.advice.removeItem(key);
+                    });
                     showToast("Confession deleted.");
                     document.getElementById("backToFeed").click();
                 }
             });
         }
+
         // AI advice
         const allAdvice = await getAdviceByConfession(confessionId);
         const aiAdvice = allAdvice.find(a => a.type === 'ai');
         document.getElementById("detailAIAdvice").innerHTML = aiAdvice ? `<div class="advice-item">${aiAdvice.content}<div class="advice-meta">🤖 AI advice</div></div>` : "<p>No AI advice yet.</p>";
+
         // Community advice
         const communityAdvice = allAdvice.filter(a => a.type === 'community');
         if (communityAdvice.length === 0) document.getElementById("detailCommunityAdvice").innerHTML = "<p>No community advice yet.</p>";
@@ -803,9 +720,10 @@
             let advHtml = '';
             for (const adv of communityAdvice) {
                 const votes = await getAdviceVoteCount(adv.id);
-                const userVote = currentUser ? await stores.votes.getItem(`${adv.id}_${currentUser.username}`) : null;
+                const userVote = await stores.votes.getItem(`${adv.id}_${userId}`);
                 const upActive = userVote?.voteType === 'up' ? 'active' : '';
                 const downActive = userVote?.voteType === 'down' ? 'active' : '';
+                const isOwner = adv.userId === userId;
                 advHtml += `
                     <div class="advice-item" data-id="${adv.id}">
                         <div><strong>${adv.authorName || 'Anonymous'}</strong> · ${new Date(adv.timestamp).toLocaleString()}</div>
@@ -815,7 +733,8 @@
                             <div class="votes">
                                 <button class="vote-btn upvote ${upActive}" data-id="${adv.id}"><i class="fas fa-arrow-up"></i> Up</button>
                                 <button class="vote-btn downvote ${downActive}" data-id="${adv.id}"><i class="fas fa-arrow-down"></i> Down</button>
-                                <button class="report-btn" data-id="${adv.id}"><i class="fas fa-flag"></i> Report</button>
+                                ${!isOwner ? `<button class="report-btn" data-id="${adv.id}"><i class="fas fa-flag"></i> Report</button>` : ''}
+                                ${isOwner ? `<button class="delete-advice-btn" data-id="${adv.id}"><i class="fas fa-trash"></i> Delete</button>` : ''}
                             </div>
                         </div>
                     </div>
@@ -824,17 +743,11 @@
             document.getElementById("detailCommunityAdvice").innerHTML = advHtml;
             attachDetailVoteHandlers();
             attachDetailReportHandlers();
+            attachDetailDeleteAdviceHandlers();
         }
+
         document.getElementById("feedView").classList.remove("active");
         document.getElementById("detailView").classList.add("active");
-    }
-
-    async function getAdviceByConfession(confessionId) {
-        const list = [];
-        await stores.advice.iterate((value) => {
-            if (value.confessionId === confessionId && !value.deleted && !value.reported) list.push(value);
-        });
-        return list.sort((a,b)=>b.timestamp-a.timestamp);
     }
 
     function attachDetailVoteHandlers() {
@@ -848,73 +761,113 @@
         });
     }
     async function handleUpvote(e) {
-        if (!currentUser) { showToast("Sign in to vote"); return; }
         const adviceId = e.currentTarget.getAttribute('data-id');
         await setVote(adviceId, 'up');
         if (currentConfessionId) await showConfessionDetail(currentConfessionId);
+        renderFeed(); // update feed counts
+        updateProfileDisplay(); // refresh reputation
     }
     async function handleDownvote(e) {
-        if (!currentUser) { showToast("Sign in to vote"); return; }
         const adviceId = e.currentTarget.getAttribute('data-id');
         await setVote(adviceId, 'down');
         if (currentConfessionId) await showConfessionDetail(currentConfessionId);
+        renderFeed();
+        updateProfileDisplay();
     }
     function attachDetailReportHandlers() {
         document.querySelectorAll('#detailCommunityAdvice .report-btn').forEach(btn => {
             btn.addEventListener('click', async () => {
                 const adviceId = btn.getAttribute('data-id');
+                await reportAdvice(adviceId);
+                showToast("Advice reported. Thank you.");
+                if (currentConfessionId) await showConfessionDetail(currentConfessionId);
+                renderFeed();
+            });
+        });
+    }
+    function attachDetailDeleteAdviceHandlers() {
+        document.querySelectorAll('#detailCommunityAdvice .delete-advice-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const adviceId = btn.getAttribute('data-id');
                 const advice = await stores.advice.getItem(adviceId);
-                if (advice) {
-                    advice.reported = true;
+                if (advice && advice.userId === userId) {
+                    advice.deleted = true;
                     await stores.advice.setItem(adviceId, advice);
-                    showToast("Advice reported. Thank you.");
+                    showToast("Your advice deleted.");
                     if (currentConfessionId) await showConfessionDetail(currentConfessionId);
+                    renderFeed();
                 }
             });
         });
     }
 
-    // ---------- Submit confession ----------
+    // ---------- Submit new confession ----------
     document.getElementById("submitConfession").addEventListener("click", async () => {
-        if (!currentUser) { showToast("Please sign in first"); return; }
         const text = document.getElementById("confessionText").value.trim();
         if (!text) { showToast("Please write your confession."); return; }
         const category = document.getElementById("category").value;
         const anonymous = document.getElementById("anonymousCheckbox").checked;
         const isPublic = document.getElementById("publicCheckbox").checked;
         const confession = {
-            id: uid(), text, category, anonymous, isPublic, timestamp: Date.now(),
-            userId: currentUser.username, deleted: false
+            id: uid(),
+            text,
+            category,
+            anonymous,
+            isPublic,
+            timestamp: Date.now(),
+            userId: userId,
+            deleted: false
         };
-        await stores.confessions.setItem(confession.id, confession);
-        const aiAdvice = { id: uid(), confessionId: confession.id, type: 'ai', content: generateAIAdvice(text, category), timestamp: Date.now(), deleted: false, reported: false };
-        await stores.advice.setItem(aiAdvice.id, aiAdvice);
+        await saveConfession(confession);
+        // Generate and save AI advice
+        const aiAdviceText = generateAIAdvice(text, category);
+        const aiAdvice = {
+            id: uid(),
+            confessionId: confession.id,
+            type: 'ai',
+            content: aiAdviceText,
+            timestamp: Date.now(),
+            userId: null,
+            deleted: false,
+            reported: false
+        };
+        await saveAdvice(aiAdvice);
         showToast("Confession posted! AI advice generated.");
         document.getElementById("confessionText").value = "";
         renderFeed();
     });
 
-    // ---------- Post advice (detail) ----------
+    // ---------- Post community advice (from detail view) ----------
     document.getElementById("postDetailAdvice").addEventListener("click", async () => {
-        if (!currentUser) { showToast("Sign in to post advice"); return; }
         const content = document.getElementById("detailAdviceText").value.trim();
         if (!content || !currentConfessionId) return;
+        const confession = await getConfessionById(currentConfessionId);
+        if (!confession) { showToast("Confession no longer exists"); return; }
         const advice = {
-            id: uid(), confessionId: currentConfessionId, type: 'community', content,
-            authorName: currentUser.username, timestamp: Date.now(), userId: currentUser.username,
-            deleted: false, reported: false
+            id: uid(),
+            confessionId: currentConfessionId,
+            type: 'community',
+            content,
+            authorName: "Someone", // anonymous
+            timestamp: Date.now(),
+            userId: userId,
+            deleted: false,
+            reported: false
         };
-        await stores.advice.setItem(advice.id, advice);
+        await saveAdvice(advice);
+        // Notify the confession owner (if not the same user)
+        if (confession.userId !== userId) {
+            await addNotification(confession.userId, `Someone replied to your confession: "${content.substring(0,50)}..."`, currentConfessionId);
+        }
         showToast("Advice posted!");
         document.getElementById("detailAdviceText").value = "";
         await showConfessionDetail(currentConfessionId);
         renderFeed();
     });
 
-    // ---------- Reply modal ----------
+    // ---------- Reply modal (on feed) ----------
     let currentReplyConfessionId = null;
     function openReplyModal(confessionId) {
-        if (!currentUser) { showToast("Sign in to reply"); return; }
         currentReplyConfessionId = confessionId;
         document.getElementById("modalAdviceText").value = "";
         document.getElementById("replyModal").classList.add("active");
@@ -922,12 +875,23 @@
     document.getElementById("modalSubmit").addEventListener("click", async () => {
         const content = document.getElementById("modalAdviceText").value.trim();
         if (!content || !currentReplyConfessionId) return;
+        const confession = await getConfessionById(currentReplyConfessionId);
+        if (!confession) { showToast("Confession no longer exists"); return; }
         const advice = {
-            id: uid(), confessionId: currentReplyConfessionId, type: 'community', content,
-            authorName: currentUser.username, timestamp: Date.now(), userId: currentUser.username,
-            deleted: false, reported: false
+            id: uid(),
+            confessionId: currentReplyConfessionId,
+            type: 'community',
+            content,
+            authorName: "Someone",
+            timestamp: Date.now(),
+            userId: userId,
+            deleted: false,
+            reported: false
         };
-        await stores.advice.setItem(advice.id, advice);
+        await saveAdvice(advice);
+        if (confession.userId !== userId) {
+            await addNotification(confession.userId, `Someone replied to your confession: "${content.substring(0,50)}..."`, currentReplyConfessionId);
+        }
         showToast("Advice posted!");
         document.getElementById("replyModal").classList.remove("active");
         renderFeed();
@@ -938,7 +902,7 @@
     // ---------- Edit confession ----------
     function openEditConfession(confessionId) {
         stores.confessions.getItem(confessionId).then(conf => {
-            if (!conf || conf.userId !== currentUser.username) return;
+            if (!conf || conf.userId !== userId) return;
             currentEditConfessionId = confessionId;
             document.getElementById("editConfessionText").value = conf.text;
             const categorySelect = document.getElementById("editCategory");
@@ -958,7 +922,7 @@
         const newCategory = document.getElementById("editCategory").value;
         if (!newText) return;
         const confession = await stores.confessions.getItem(currentEditConfessionId);
-        if (confession && confession.userId === currentUser.username) {
+        if (confession && confession.userId === userId) {
             confession.text = newText;
             confession.category = newCategory;
             await stores.confessions.setItem(currentEditConfessionId, confession);
@@ -969,6 +933,131 @@
         }
     });
     document.getElementById("cancelEditConfession").addEventListener("click", () => document.getElementById("editConfessionModal").classList.remove("active"));
+
+    // ---------- Dashboard (My Stuff) ----------
+    async function showDashboard() {
+        await updateProfileDisplay();
+        await renderMyConfessions();
+        await renderMyAdvice();
+        document.getElementById("feedView").classList.remove("active");
+        document.getElementById("detailView").classList.remove("active");
+        document.getElementById("dashboardView").classList.add("active");
+    }
+    async function renderMyConfessions() {
+        const myConfs = [];
+        await stores.confessions.iterate((conf) => {
+            if (conf.userId === userId && !conf.deleted && (Date.now() - conf.timestamp < EXPIRATION_MS)) {
+                myConfs.push(conf);
+            }
+        });
+        myConfs.sort((a,b)=>b.timestamp-a.timestamp);
+        if (myConfs.length === 0) {
+            document.getElementById("myConfessions").innerHTML = "<p>You haven't posted any confessions.</p>";
+            return;
+        }
+        let html = '';
+        for (const conf of myConfs) {
+            const remaining = getRemainingTime(conf.timestamp);
+            html += `
+                <div class="confession-item" style="margin-bottom:1rem;">
+                    <div><strong>${conf.anonymous ? 'Anonymous' : 'You'}</strong> · ${conf.category}</div>
+                    <div>${conf.text.substring(0,100)}${conf.text.length>100?'…':''}</div>
+                    <div class="timestamp">${new Date(conf.timestamp).toLocaleString()} · <span class="expiry-badge">${remaining}</span></div>
+                    <div style="margin-top:0.5rem;">
+                        <button class="secondary-btn edit-confession" data-id="${conf.id}">Edit</button>
+                        <button class="danger-btn delete-confession" data-id="${conf.id}">Delete</button>
+                    </div>
+                </div>
+            `;
+        }
+        document.getElementById("myConfessions").innerHTML = html;
+        document.querySelectorAll('.edit-confession').forEach(btn => {
+            btn.addEventListener('click', () => openEditConfession(btn.getAttribute('data-id')));
+        });
+        document.querySelectorAll('.delete-confession').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (confirm("Delete this confession? All advice will also be removed.")) {
+                    const id = btn.getAttribute('data-id');
+                    const conf = await stores.confessions.getItem(id);
+                    if (conf && conf.userId === userId) {
+                        conf.deleted = true;
+                        await stores.confessions.setItem(id, conf);
+                        await stores.advice.iterate((adv, key) => {
+                            if (adv.confessionId === id) stores.advice.removeItem(key);
+                        });
+                        showToast("Confession deleted.");
+                        renderMyConfessions();
+                        renderFeed();
+                    }
+                }
+            });
+        });
+    }
+    async function renderMyAdvice() {
+        const myAdv = [];
+        await stores.advice.iterate((adv) => {
+            if (adv.userId === userId && !adv.deleted && adv.type === 'community') myAdv.push(adv);
+        });
+        myAdv.sort((a,b)=>b.timestamp-a.timestamp);
+        if (myAdv.length === 0) {
+            document.getElementById("myAdvice").innerHTML = "<p>You haven't posted any advice.</p>";
+            return;
+        }
+        let html = '';
+        for (const adv of myAdv) {
+            const confession = await stores.confessions.getItem(adv.confessionId);
+            const votes = await getAdviceVoteCount(adv.id);
+            html += `
+                <div class="advice-item" style="margin-bottom:1rem;">
+                    <div><strong>To:</strong> ${confession ? (confession.anonymous ? 'Anonymous' : 'Someone') : 'Unknown'}</div>
+                    <div>${adv.content.substring(0,100)}${adv.content.length>100?'…':''}</div>
+                    <div class="advice-meta">👍 ${votes.score} points · ${new Date(adv.timestamp).toLocaleString()}</div>
+                    <button class="danger-btn delete-my-advice" data-id="${adv.id}">Delete</button>
+                </div>
+            `;
+        }
+        document.getElementById("myAdvice").innerHTML = html;
+        document.querySelectorAll('.delete-my-advice').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.getAttribute('data-id');
+                const adv = await stores.advice.getItem(id);
+                if (adv && adv.userId === userId) {
+                    adv.deleted = true;
+                    await stores.advice.setItem(id, adv);
+                    showToast("Advice deleted.");
+                    renderMyAdvice();
+                    if (currentConfessionId === adv.confessionId) await showConfessionDetail(currentConfessionId);
+                    renderFeed();
+                }
+            });
+        });
+    }
+
+    // ---------- Notifications ----------
+    async function checkNotifications() {
+        let count = 0;
+        await stores.notifications.iterate((n) => { if (n.userId === userId && !n.read) count++; });
+        const badge = document.getElementById("notificationCount");
+        if (count > 0) { badge.textContent = count; badge.style.display = "flex"; }
+        else badge.style.display = "none";
+    }
+    document.getElementById("notificationIcon").addEventListener("click", async () => {
+        const list = [];
+        await stores.notifications.iterate((n) => { if (n.userId === userId) list.push(n); });
+        list.sort((a,b)=>b.timestamp-a.timestamp);
+        const html = list.length ? list.map(n => `<div>${n.message} - ${new Date(n.timestamp).toLocaleString()}</div>`).join('') : "<p>No notifications</p>";
+        document.getElementById("notificationsList").innerHTML = html;
+        document.getElementById("notificationsModal").classList.add("active");
+        // mark as read
+        for (const n of list) { n.read = true; await stores.notifications.setItem(n.id, n); }
+        checkNotifications();
+    });
+    document.getElementById("clearNotifications").addEventListener("click", async () => {
+        await stores.notifications.clear();
+        checkNotifications();
+        document.getElementById("notificationsList").innerHTML = "<p>No notifications</p>";
+    });
+    document.getElementById("closeNotifications").addEventListener("click", () => document.getElementById("notificationsModal").classList.remove("active"));
 
     // ---------- Back to feed ----------
     document.getElementById("backToFeed").addEventListener("click", () => {
@@ -982,6 +1071,7 @@
         document.getElementById("feedView").classList.add("active");
         renderFeed();
     });
+    document.getElementById("dashboardBtn").addEventListener("click", showDashboard);
 
     // ---------- Filters ----------
     document.querySelectorAll('#categoryFilter .filter-chip').forEach(chip => {
@@ -1014,44 +1104,7 @@
         });
     });
 
-    // ---------- Notifications (simulated) ----------
-    async function checkNotifications() {
-        if (!currentUser) return;
-        let count = 0;
-        await stores.notifications.iterate((n) => { if (n.userId === currentUser.username && !n.read) count++; });
-        const badge = document.getElementById("notificationCount");
-        if (count > 0) { badge.textContent = count; badge.style.display = "flex"; }
-        else badge.style.display = "none";
-    }
-    document.getElementById("notificationIcon").addEventListener("click", async () => {
-        if (!currentUser) { showToast("Sign in to see notifications"); return; }
-        const list = [];
-        await stores.notifications.iterate((n) => { if (n.userId === currentUser.username) list.push(n); });
-        list.sort((a,b)=>b.timestamp-a.timestamp);
-        const html = list.length ? list.map(n => `<div>${n.message} - ${new Date(n.timestamp).toLocaleString()}</div>`).join('') : "<p>No notifications</p>";
-        document.getElementById("notificationsList").innerHTML = html;
-        document.getElementById("notificationsModal").classList.add("active");
-        // mark as read
-        for (const n of list) { n.read = true; await stores.notifications.setItem(n.id, n); }
-        checkNotifications();
-    });
-    document.getElementById("clearNotifications").addEventListener("click", async () => {
-        await stores.notifications.clear();
-        checkNotifications();
-        document.getElementById("notificationsList").innerHTML = "<p>No notifications</p>";
-    });
-    document.getElementById("closeNotifications").addEventListener("click", () => document.getElementById("notificationsModal").classList.remove("active"));
-
-    // ---------- Auth modal ----------
-    document.getElementById("authBtn").onclick = () => document.getElementById("authModal").classList.add("active");
-    document.getElementById("authSubmit").onclick = async () => {
-        const username = document.getElementById("authUsername").value.trim();
-        const password = document.getElementById("authPassword").value;
-        if (!username || !password) { showToast("Enter username and password"); return; }
-        await registerOrLogin(username, password);
-    };
-
-    // ---------- Theme & init ----------
+    // ---------- Theme ----------
     const themeToggle = document.getElementById("themeToggle");
     themeToggle.addEventListener("click", () => {
         document.body.classList.toggle("dark");
@@ -1061,24 +1114,24 @@
     if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark');
     themeToggle.innerHTML = document.body.classList.contains('dark') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
 
+    // ---------- Helpers ----------
+    function getRemainingTime(timestamp) {
+        const elapsed = Date.now() - timestamp;
+        const remaining = EXPIRATION_MS - elapsed;
+        if (remaining <= 0) return "Expired";
+        const hours = Math.floor(remaining / (1000 * 60 * 60));
+        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+        if (hours > 0) return `${hours}h ${minutes}m left`;
+        return `${minutes}m left`;
+    }
+
+    // ---------- Initial load ----------
     async function init() {
-        const savedUser = localStorage.getItem('currentUser');
-        if (savedUser) {
-            const user = await stores.users.getItem(savedUser);
-            if (user) currentUser = user;
-        }
-        if (currentUser) {
-            document.getElementById("authBtn").innerHTML = `<i class="fas fa-user"></i> ${currentUser.username} <i class="fas fa-chevron-down"></i>`;
-            document.getElementById("authBtn").onclick = () => showDashboard();
-            await loadUserData();
-        } else {
-            document.getElementById("authBtn").innerHTML = "Sign In";
-            document.getElementById("authBtn").onclick = () => document.getElementById("authModal").classList.add("active");
-        }
-        renderFeed();
+        await renderFeed();
         renderExpertAdvice();
         setInterval(() => { renderFeed(); checkNotifications(); }, 60000);
         checkNotifications();
+        updateProfileDisplay();
     }
     init();
 </script>
