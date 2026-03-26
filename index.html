@@ -198,6 +198,30 @@
             padding-left: 0.5rem;
         }
 
+        .confession-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .confession-stats {
+            display: flex;
+            gap: 0.8rem;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .advice-preview {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: var(--bg);
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            border-left: 2px solid var(--primary);
+        }
+
         .filter-bar {
             display: flex;
             gap: 0.5rem;
@@ -246,6 +270,40 @@
             margin-bottom: 1rem;
             cursor: pointer;
             color: var(--primary);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--card);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--border);
+        }
+        .modal-content textarea {
+            width: 100%;
+            margin: 1rem 0;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
         }
 
         /* View switching */
@@ -341,6 +399,19 @@
         </div>
     </div>
 </div>
+
+<!-- Modal for quick reply -->
+<div id="replyModal" class="modal">
+    <div class="modal-content">
+        <h3>Reply with advice</h3>
+        <textarea id="modalAdviceText" rows="4" placeholder="Share your genuine advice..."></textarea>
+        <div class="modal-buttons">
+            <button id="modalCancel" class="secondary-btn">Cancel</button>
+            <button id="modalSubmit">Post Advice</button>
+        </div>
+    </div>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
@@ -433,7 +504,6 @@
     async function reportAdvice(adviceId, reason = 'inappropriate') {
         const key = `${adviceId}_${userId}`;
         await stores.reports.setItem(key, { adviceId, userId, reason, timestamp: Date.now() });
-        // Mark advice as reported (soft delete from public view)
         const advice = await stores.advice.getItem(adviceId);
         if (advice) {
             advice.reported = true;
@@ -488,7 +558,7 @@
         document.querySelector('.expert-downvote')?.addEventListener('click', () => showToast("Feedback recorded."));
     }
 
-    // ---------- Feed rendering ----------
+    // ---------- Feed rendering with reply buttons and advice counts ----------
     let currentFilter = "all";
 
     async function renderPublicFeed() {
@@ -503,23 +573,99 @@
         }
         let html = '';
         for (const conf of filtered) {
+            // Get all advice for this confession
+            const adviceList = await getAdviceByConfession(conf.id);
+            const adviceCount = adviceList.length;
+            const firstAdvice = adviceCount > 0 ? adviceList[0] : null;
+            const aiAdviceExists = adviceList.some(a => a.type === 'ai');
+            const displayCount = adviceCount; // includes AI
             html += `
                 <div class="confession-item" data-id="${conf.id}">
-                    <div><strong>${conf.anonymous ? 'Anonymous' : 'Someone'}</strong> · ${conf.category}</div>
+                    <div class="confession-header">
+                        <div><strong>${conf.anonymous ? 'Anonymous' : 'Someone'}</strong> · ${conf.category}</div>
+                        <div class="confession-stats">
+                            <span><i class="fas fa-comment"></i> ${displayCount} advice</span>
+                            <button class="reply-btn" data-id="${conf.id}" data-category="${conf.category}">💬 Reply</button>
+                        </div>
+                    </div>
                     <div>${conf.text.substring(0, 200)}${conf.text.length > 200 ? '…' : ''}</div>
                     <div class="timestamp">${new Date(conf.timestamp).toLocaleString()}</div>
+                    ${firstAdvice ? `
+                        <div class="advice-preview">
+                            <i class="fas fa-quote-left"></i> ${firstAdvice.content.substring(0, 100)}${firstAdvice.content.length > 100 ? '…' : ''}
+                            ${adviceCount > 1 ? `<a href="#" class="see-more" data-id="${conf.id}"> See more (${adviceCount-1} more)</a>` : ''}
+                        </div>
+                    ` : ''}
                 </div>
             `;
         }
         document.getElementById("publicFeed").innerHTML = html;
-        // attach click handlers
+        // Attach click handlers
         document.querySelectorAll('.confession-item').forEach(el => {
-            el.addEventListener('click', () => {
+            el.addEventListener('click', (e) => {
+                // Avoid if clicking on reply button or see more
+                if (e.target.classList.contains('reply-btn') || e.target.classList.contains('see-more')) return;
                 const id = el.getAttribute('data-id');
                 showConfessionDetail(id);
             });
         });
+        // Reply buttons
+        document.querySelectorAll('.reply-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const confessionId = btn.getAttribute('data-id');
+                openReplyModal(confessionId);
+            });
+        });
+        // See more links
+        document.querySelectorAll('.see-more').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const confessionId = link.getAttribute('data-id');
+                showConfessionDetail(confessionId);
+            });
+        });
     }
+
+    // ---------- Modal for quick reply ----------
+    let currentReplyConfessionId = null;
+    function openReplyModal(confessionId) {
+        currentReplyConfessionId = confessionId;
+        const modal = document.getElementById("replyModal");
+        document.getElementById("modalAdviceText").value = "";
+        modal.classList.add("active");
+    }
+    function closeReplyModal() {
+        document.getElementById("replyModal").classList.remove("active");
+        currentReplyConfessionId = null;
+    }
+    async function submitReply() {
+        const content = document.getElementById("modalAdviceText").value.trim();
+        if (!content) { showToast("Please write your advice."); return; }
+        if (!currentReplyConfessionId) return;
+        const advice = {
+            id: uid(),
+            confessionId: currentReplyConfessionId,
+            type: 'community',
+            content,
+            authorName: "Community member",
+            timestamp: Date.now(),
+            userId,
+            deleted: false,
+            reported: false
+        };
+        await saveAdvice(advice);
+        showToast("Advice posted!");
+        closeReplyModal();
+        await renderPublicFeed(); // refresh feed to show new advice count and preview
+        // Also if detail view is open for this confession, refresh it
+        if (document.getElementById("detailView").classList.contains("active") && currentConfessionId === currentReplyConfessionId) {
+            await showConfessionDetail(currentReplyConfessionId);
+        }
+    }
+    document.getElementById("modalCancel").addEventListener("click", closeReplyModal);
+    document.getElementById("modalSubmit").addEventListener("click", submitReply);
 
     // ---------- Confession detail view ----------
     let currentConfessionId = null;
@@ -549,7 +695,6 @@
         if (communityAdvice.length === 0) {
             document.getElementById("detailCommunityAdvice").innerHTML = "<p>No community advice yet. Be the first to help!</p>";
         } else {
-            // get vote counts and user votes
             let adviceHtml = '';
             for (const adv of communityAdvice) {
                 const votes = await getAdviceVoteCount(adv.id);
@@ -606,7 +751,6 @@
             }
             await setVote(adviceId, 'up');
         }
-        // refresh detail view to update votes
         if (currentConfessionId) await showConfessionDetail(currentConfessionId);
     }
 
@@ -699,14 +843,15 @@
         showToast("Advice posted!");
         document.getElementById("detailAdviceText").value = "";
         await showConfessionDetail(currentConfessionId);
+        await renderPublicFeed(); // update feed counts
     });
 
     // ---------- Back to feed ----------
-    document.getElementById("backToFeed").addEventListener("click", () => {
+    document.getElementById("backToFeed").addEventListener("click", async () => {
         document.getElementById("feedView").classList.add("active");
         document.getElementById("detailView").classList.remove("active");
         currentConfessionId = null;
-        renderPublicFeed();
+        await renderPublicFeed();
     });
 
     // ---------- Filter chips ----------
