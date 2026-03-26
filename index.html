@@ -213,6 +213,19 @@
             color: #64748b;
         }
 
+        .expiry-badge {
+            font-size: 0.7rem;
+            background: var(--warning);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+            display: inline-block;
+        }
+
+        .expired-badge {
+            background: var(--danger);
+        }
+
         .advice-preview {
             margin-top: 0.5rem;
             padding: 0.5rem;
@@ -330,7 +343,7 @@
     <div class="header">
         <div class="logo">
             <h1><i class="fas fa-feather-alt"></i> whisper</h1>
-            <p>Share freely · Get genuine advice</p>
+            <p>Share freely · Get genuine advice · Posts expire in 48h</p>
         </div>
         <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i> Dark mode</button>
     </div>
@@ -351,6 +364,7 @@
             <label><input type="checkbox" id="anonymousCheckbox"> Post anonymously</label>
             <label><input type="checkbox" id="publicCheckbox" checked> Make public (visible to community)</label>
             <button id="submitConfession">Submit & get AI advice</button>
+            <div class="timestamp" style="margin-top: 0.5rem;"><i class="fas fa-hourglass-half"></i> Posts automatically disappear after 48 hours.</div>
         </div>
 
         <div class="card">
@@ -424,6 +438,9 @@
         reports: localforage.createInstance({ name: "whisper", storeName: "reports" })
     };
 
+    // Expiration: 48 hours in milliseconds
+    const EXPIRATION_MS = 48 * 60 * 60 * 1000;
+
     // Helper: generate unique ID
     function uid() {
         return Date.now() + '-' + Math.random().toString(36).substr(2, 8);
@@ -442,16 +459,29 @@
         return confession;
     }
 
+    // Get non-expired public confessions
     async function getPublicConfessions() {
         const confs = [];
+        const now = Date.now();
         await stores.confessions.iterate((value, key) => {
-            if (value.isPublic && !value.deleted) confs.push(value);
+            if (value.isPublic && !value.deleted) {
+                // Check expiration
+                if (now - value.timestamp < EXPIRATION_MS) {
+                    confs.push(value);
+                }
+            }
         });
         return confs.sort((a,b) => b.timestamp - a.timestamp);
     }
 
     async function getConfessionById(id) {
-        return await stores.confessions.getItem(id);
+        const confession = await stores.confessions.getItem(id);
+        if (!confession) return null;
+        // Check expiration
+        if (Date.now() - confession.timestamp >= EXPIRATION_MS) {
+            return null; // expired, treat as not found
+        }
+        return confession;
     }
 
     async function saveAdvice(advice) {
@@ -509,6 +539,17 @@
             advice.reported = true;
             await stores.advice.setItem(adviceId, advice);
         }
+    }
+
+    // Helper: get remaining time string
+    function getRemainingTime(timestamp) {
+        const elapsed = Date.now() - timestamp;
+        const remaining = EXPIRATION_MS - elapsed;
+        if (remaining <= 0) return "Expired";
+        const hours = Math.floor(remaining / (1000 * 60 * 60));
+        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+        if (hours > 0) return `${hours}h ${minutes}m remaining`;
+        return `${minutes}m remaining`;
     }
 
     // ---------- AI advice generator (enhanced) ----------
@@ -573,19 +614,19 @@
         }
         let html = '';
         for (const conf of filtered) {
-            // Get all advice for this confession
             const adviceList = await getAdviceByConfession(conf.id);
             const adviceCount = adviceList.length;
             const firstAdvice = adviceCount > 0 ? adviceList[0] : null;
-            const aiAdviceExists = adviceList.some(a => a.type === 'ai');
-            const displayCount = adviceCount; // includes AI
+            const remaining = getRemainingTime(conf.timestamp);
+            const expiryClass = remaining === "Expired" ? "expired-badge" : "";
             html += `
                 <div class="confession-item" data-id="${conf.id}">
                     <div class="confession-header">
                         <div><strong>${conf.anonymous ? 'Anonymous' : 'Someone'}</strong> · ${conf.category}</div>
                         <div class="confession-stats">
-                            <span><i class="fas fa-comment"></i> ${displayCount} advice</span>
+                            <span><i class="fas fa-comment"></i> ${adviceCount} advice</span>
                             <button class="reply-btn" data-id="${conf.id}" data-category="${conf.category}">💬 Reply</button>
+                            <span class="expiry-badge ${expiryClass}"><i class="fas fa-hourglass-half"></i> ${remaining}</span>
                         </div>
                     </div>
                     <div>${conf.text.substring(0, 200)}${conf.text.length > 200 ? '…' : ''}</div>
@@ -603,7 +644,6 @@
         // Attach click handlers
         document.querySelectorAll('.confession-item').forEach(el => {
             el.addEventListener('click', (e) => {
-                // Avoid if clicking on reply button or see more
                 if (e.target.classList.contains('reply-btn') || e.target.classList.contains('see-more')) return;
                 const id = el.getAttribute('data-id');
                 showConfessionDetail(id);
@@ -672,13 +712,18 @@
 
     async function showConfessionDetail(confessionId) {
         const confession = await getConfessionById(confessionId);
-        if (!confession) return;
+        if (!confession) {
+            showToast("This confession has expired or does not exist.");
+            document.getElementById("backToFeed").click();
+            return;
+        }
         currentConfessionId = confessionId;
         document.getElementById("detailTitle").innerHTML = `Confession · ${confession.anonymous ? 'Anonymous' : 'Someone'}`;
+        const remaining = getRemainingTime(confession.timestamp);
         document.getElementById("detailConfession").innerHTML = `
             <div><strong>Category:</strong> ${confession.category}</div>
             <div style="margin-top: 0.5rem;">${confession.text}</div>
-            <div class="timestamp">${new Date(confession.timestamp).toLocaleString()}</div>
+            <div class="timestamp">${new Date(confession.timestamp).toLocaleString()} · <span class="expiry-badge"><i class="fas fa-hourglass-half"></i> ${remaining}</span></div>
         `;
 
         // AI advice
@@ -818,7 +863,7 @@
         };
         await saveAdvice(aiAdvice);
 
-        showToast("Confession submitted! AI advice generated.");
+        showToast("Confession submitted! AI advice generated. It will expire in 48 hours.");
         document.getElementById("confessionText").value = "";
         await renderPublicFeed();
     });
@@ -909,6 +954,10 @@
     async function init() {
         await renderPublicFeed();
         renderExpertAdvice();
+        // Optional: periodic cleanup every hour (just re-renders, filtering on fetch)
+        setInterval(async () => {
+            await renderPublicFeed();
+        }, 60 * 60 * 1000);
     }
     init();
 </script>
