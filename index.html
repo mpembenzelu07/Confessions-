@@ -3,14 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Whisper · Genuine Confession & Advice Hub</title>
+    <title>Whisper · Anonymous Confessions & Genuine Advice</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --bg: #f8fafc;
@@ -23,30 +19,24 @@
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
+            --accent: #ec489a;
         }
-
         body.dark {
             --bg: #0f172a;
             --card: #1e293b;
             --text: #f1f5f9;
             --border: #334155;
         }
-
         body {
             background: var(--bg);
             color: var(--text);
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            line-height: 1.5;
+            transition: all 0.2s;
             padding: 1rem;
-            transition: background 0.2s, color 0.2s;
         }
+        .container { max-width: 1400px; margin: 0 auto; }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* Header */
+        /* header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -55,21 +45,15 @@
             gap: 1rem;
             margin-bottom: 2rem;
         }
-
         .logo h1 {
             font-size: 2rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
         }
-
-        .logo p {
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        .theme-toggle {
+        .logo p { font-size: 0.9rem; opacity: 0.8; }
+        .theme-toggle, .auth-btn {
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: 2rem;
@@ -78,8 +62,31 @@
             font-weight: 500;
             color: var(--text);
         }
+        .user-menu {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .notification-badge {
+            position: relative;
+            cursor: pointer;
+        }
+        .notification-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-        /* Cards */
+        /* cards */
         .card {
             background: var(--card);
             border-radius: 1.5rem;
@@ -87,8 +94,9 @@
             margin-bottom: 1.5rem;
             box-shadow: 0 4px 6px -2px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.1);
             border: 1px solid var(--border);
+            transition: transform 0.2s;
         }
-
+        .card:hover { transform: translateY(-2px); }
         h2 {
             font-size: 1.5rem;
             margin-bottom: 1rem;
@@ -96,8 +104,6 @@
             align-items: center;
             gap: 0.5rem;
         }
-
-        /* Forms */
         input, textarea, select {
             width: 100%;
             padding: 0.75rem;
@@ -105,10 +111,8 @@
             border-radius: 1rem;
             background: var(--bg);
             color: var(--text);
-            font-family: inherit;
             margin-bottom: 1rem;
         }
-
         button {
             background: var(--primary);
             color: white;
@@ -119,130 +123,36 @@
             cursor: pointer;
             transition: 0.2s;
         }
-
-        button:hover {
-            background: var(--primary-dark);
-        }
-
+        button:hover { background: var(--primary-dark); }
         .secondary-btn {
             background: transparent;
             border: 1px solid var(--border);
             color: var(--text);
         }
+        .danger-btn { background: var(--danger); }
+        .danger-btn:hover { background: #dc2626; }
 
-        /* Advice items */
-        .advice-item {
-            background: var(--bg);
-            border-radius: 1rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-left: 4px solid var(--primary);
-        }
-
-        .advice-meta {
+        /* feed */
+        .feed-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.8rem;
-            margin-top: 0.5rem;
-            color: #64748b;
             flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .votes {
-            display: flex;
             gap: 1rem;
-            align-items: center;
+            margin-bottom: 1rem;
         }
-
-        .vote-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--text);
-            opacity: 0.6;
-            font-size: 0.9rem;
-        }
-
-        .vote-btn:hover {
-            opacity: 1;
-        }
-
-        .vote-btn.active {
-            opacity: 1;
-            color: var(--primary);
-        }
-
-        .report-btn {
-            color: var(--danger);
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-
-        /* Feed */
-        .confession-feed {
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        .confession-item {
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 0;
-            cursor: pointer;
-            transition: background 0.1s;
-        }
-
-        .confession-item:hover {
-            background: rgba(59,130,246,0.05);
-            padding-left: 0.5rem;
-        }
-
-        .confession-header {
+        .search-box {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
             gap: 0.5rem;
+            flex: 1;
         }
-
-        .confession-stats {
-            display: flex;
-            gap: 0.8rem;
-            font-size: 0.8rem;
-            color: #64748b;
-        }
-
-        .expiry-badge {
-            font-size: 0.7rem;
-            background: var(--warning);
-            color: white;
-            padding: 0.2rem 0.5rem;
-            border-radius: 1rem;
-            display: inline-block;
-        }
-
-        .expired-badge {
-            background: var(--danger);
-        }
-
-        .advice-preview {
-            margin-top: 0.5rem;
-            padding: 0.5rem;
-            background: var(--bg);
-            border-radius: 0.5rem;
-            font-size: 0.85rem;
-            border-left: 2px solid var(--primary);
-        }
-
+        .search-box input { margin-bottom: 0; }
         .filter-bar {
             display: flex;
             gap: 0.5rem;
             flex-wrap: wrap;
-            margin-bottom: 1rem;
         }
-
-        .filter-chip {
+        .filter-chip, .trending-chip {
             background: var(--bg);
             border: 1px solid var(--border);
             border-radius: 2rem;
@@ -250,42 +160,41 @@
             cursor: pointer;
             font-size: 0.8rem;
         }
-
-        .filter-chip.active {
+        .filter-chip.active, .trending-chip.active {
             background: var(--primary);
             color: white;
-            border-color: var(--primary);
         }
-
-        .timestamp {
-            font-size: 0.7rem;
-            opacity: 0.6;
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1f2e3a;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 2rem;
-            font-size: 0.9rem;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-        }
-
-        .back-btn {
-            display: inline-block;
-            margin-bottom: 1rem;
+        .confession-item {
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
             cursor: pointer;
-            color: var(--primary);
         }
+        .confession-item:hover { background: rgba(59,130,246,0.05); padding-left: 0.5rem; }
+        .confession-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .confession-stats {
+            display: flex;
+            gap: 0.8rem;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+        .expiry-badge {
+            font-size: 0.7rem;
+            background: var(--warning);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+        }
+        .expired-badge { background: var(--danger); }
+        .like-btn { cursor: pointer; color: var(--danger); }
+        .like-btn.liked { color: var(--danger); opacity: 1; }
 
-        /* Modal */
+        /* modal */
         .modal {
             display: none;
             position: fixed;
@@ -298,43 +207,39 @@
             justify-content: center;
             align-items: center;
         }
-        .modal.active {
-            display: flex;
-        }
+        .modal.active { display: flex; }
         .modal-content {
             background: var(--card);
             border-radius: 1.5rem;
             padding: 1.5rem;
             max-width: 500px;
             width: 90%;
-            border: 1px solid var(--border);
         }
-        .modal-content textarea {
-            width: 100%;
-            margin: 1rem 0;
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2e3a;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
         }
-        .modal-buttons {
-            display: flex;
-            gap: 0.5rem;
-            justify-content: flex-end;
+        .view { display: none; }
+        .view.active { display: block; }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            color: var(--primary);
         }
-
-        /* View switching */
-        .view {
-            display: none;
-        }
-
-        .view.active {
-            display: block;
-        }
-
         @media (max-width: 768px) {
-            .card {
-                padding: 1rem;
-            }
-            h2 {
-                font-size: 1.2rem;
-            }
+            .card { padding: 1rem; }
+            h2 { font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -343,16 +248,23 @@
     <div class="header">
         <div class="logo">
             <h1><i class="fas fa-feather-alt"></i> whisper</h1>
-            <p>Share freely · Get genuine advice · Posts expire in 48h</p>
+            <p>Speak freely · Get genuine advice · Posts vanish in 48h</p>
         </div>
-        <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i> Dark mode</button>
+        <div class="user-menu">
+            <div class="notification-badge" id="notificationIcon">
+                <i class="fas fa-bell"></i>
+                <span id="notificationCount" class="notification-count" style="display:none;">0</span>
+            </div>
+            <button class="auth-btn" id="authBtn">Sign In</button>
+            <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+        </div>
     </div>
 
-    <!-- Main Feed View -->
+    <!-- Feed View -->
     <div id="feedView" class="view active">
         <div class="card">
             <h2><i class="fas fa-pen-fancy"></i> Write your confession</h2>
-            <textarea id="confessionText" rows="4" placeholder="What's on your mind? I feel... I need advice about..."></textarea>
+            <textarea id="confessionText" rows="4" placeholder="What's on your mind? I need advice about..."></textarea>
             <select id="category">
                 <option value="mental health">🧠 Mental Health</option>
                 <option value="relationships">❤️ Relationships</option>
@@ -362,13 +274,18 @@
                 <option value="other">🌟 Other</option>
             </select>
             <label><input type="checkbox" id="anonymousCheckbox"> Post anonymously</label>
-            <label><input type="checkbox" id="publicCheckbox" checked> Make public (visible to community)</label>
+            <label><input type="checkbox" id="publicCheckbox" checked> Make public</label>
             <button id="submitConfession">Submit & get AI advice</button>
-            <div class="timestamp" style="margin-top: 0.5rem;"><i class="fas fa-hourglass-half"></i> Posts automatically disappear after 48 hours.</div>
         </div>
 
         <div class="card">
-            <h2><i class="fas fa-newspaper"></i> Public confessions</h2>
+            <div class="feed-header">
+                <h2><i class="fas fa-newspaper"></i> Public confessions</h2>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search confessions...">
+                    <button id="searchBtn"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
             <div class="filter-bar" id="categoryFilter">
                 <button class="filter-chip active" data-filter="all">All</button>
                 <button class="filter-chip" data-filter="mental health">🧠 Mental Health</button>
@@ -378,11 +295,16 @@
                 <button class="filter-chip" data-filter="health">🏥 Health</button>
                 <button class="filter-chip" data-filter="other">🌟 Other</button>
             </div>
-            <div id="publicFeed" class="confession-feed">Loading confessions...</div>
+            <div class="filter-bar" id="trendingFilter">
+                <button class="trending-chip active" data-trend="latest">Latest</button>
+                <button class="trending-chip" data-trend="trending">🔥 Trending (most advice)</button>
+                <button class="trending-chip" data-trend="most-liked">❤️ Most liked</button>
+            </div>
+            <div id="publicFeed" class="confession-feed" style="max-height: 500px; overflow-y: auto;">Loading...</div>
         </div>
 
         <div class="card">
-            <h2><i class="fas fa-user-md"></i> Advice from experts</h2>
+            <h2><i class="fas fa-user-md"></i> Experts advice</h2>
             <div class="filter-bar" id="expertSectors">
                 <button class="filter-chip active" data-sector="mental health">🧠 Mental Health</button>
                 <button class="filter-chip" data-sector="relationships">❤️ Relationships</button>
@@ -394,12 +316,13 @@
         </div>
     </div>
 
-    <!-- Confession Detail View -->
+    <!-- Detail View -->
     <div id="detailView" class="view">
-        <div class="back-btn" id="backToFeed"><i class="fas fa-arrow-left"></i> Back to feed</div>
+        <div class="back-btn" id="backToFeed"><i class="fas fa-arrow-left"></i> Back</div>
         <div class="card">
             <h2 id="detailTitle">Confession</h2>
             <div id="detailConfession"></div>
+            <div style="margin-top: 1rem;" id="detailActions"></div>
         </div>
         <div class="card">
             <h2><i class="fas fa-robot"></i> AI advice</h2>
@@ -412,151 +335,271 @@
             <button id="postDetailAdvice">Post advice</button>
         </div>
     </div>
-</div>
 
-<!-- Modal for quick reply -->
-<div id="replyModal" class="modal">
-    <div class="modal-content">
-        <h3>Reply with advice</h3>
-        <textarea id="modalAdviceText" rows="4" placeholder="Share your genuine advice..."></textarea>
-        <div class="modal-buttons">
-            <button id="modalCancel" class="secondary-btn">Cancel</button>
-            <button id="modalSubmit">Post Advice</button>
+    <!-- Dashboard View -->
+    <div id="dashboardView" class="view">
+        <div class="back-btn" id="backToFeedFromDashboard"><i class="fas fa-arrow-left"></i> Back</div>
+        <div class="card">
+            <h2><i class="fas fa-user"></i> Your profile</h2>
+            <div id="profileInfo"></div>
+        </div>
+        <div class="card">
+            <h2><i class="fas fa-history"></i> Your confessions</h2>
+            <div id="myConfessions"></div>
+        </div>
+        <div class="card">
+            <h2><i class="fas fa-comments"></i> Your advice</h2>
+            <div id="myAdvice"></div>
         </div>
     </div>
-</div>
 
-<div id="toast" class="toast"></div>
+    <!-- Notifications Modal -->
+    <div id="notificationsModal" class="modal">
+        <div class="modal-content">
+            <h3>Notifications</h3>
+            <div id="notificationsList"></div>
+            <button id="clearNotifications" class="secondary-btn">Clear all</button>
+            <button id="closeNotifications">Close</button>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <h3 id="authTitle">Sign In / Sign Up</h3>
+            <input type="text" id="authUsername" placeholder="Username">
+            <input type="password" id="authPassword" placeholder="Password">
+            <button id="authSubmit">Sign In</button>
+            <p style="margin-top: 0.5rem; font-size:0.8rem;">Demo: use any username/password; account will be created.</p>
+        </div>
+    </div>
+
+    <!-- Edit Confession Modal -->
+    <div id="editConfessionModal" class="modal">
+        <div class="modal-content">
+            <h3>Edit confession</h3>
+            <textarea id="editConfessionText" rows="4"></textarea>
+            <select id="editCategory"></select>
+            <div class="modal-buttons" style="display: flex; gap:0.5rem; margin-top:1rem;">
+                <button id="saveEditConfession">Save</button>
+                <button id="cancelEditConfession" class="secondary-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reply Modal -->
+    <div id="replyModal" class="modal">
+        <div class="modal-content">
+            <h3>Reply with advice</h3>
+            <textarea id="modalAdviceText" rows="4" placeholder="Share your genuine advice..."></textarea>
+            <div class="modal-buttons">
+                <button id="modalCancel" class="secondary-btn">Cancel</button>
+                <button id="modalSubmit">Post Advice</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
 <script>
-    // ---------- Data Stores ----------
+    // ---------- CONSTANTS ----------
+    const EXPIRATION_MS = 48 * 60 * 60 * 1000;
     const stores = {
+        users: localforage.createInstance({ name: "whisper", storeName: "users" }),
         confessions: localforage.createInstance({ name: "whisper", storeName: "confessions" }),
         advice: localforage.createInstance({ name: "whisper", storeName: "advice" }),
         votes: localforage.createInstance({ name: "whisper", storeName: "votes" }),
-        reports: localforage.createInstance({ name: "whisper", storeName: "reports" })
+        reports: localforage.createInstance({ name: "whisper", storeName: "reports" }),
+        likes: localforage.createInstance({ name: "whisper", storeName: "likes" }),
+        notifications: localforage.createInstance({ name: "whisper", storeName: "notifications" })
     };
 
-    // Expiration: 48 hours in milliseconds
-    const EXPIRATION_MS = 48 * 60 * 60 * 1000;
+    let currentUser = null;
+    let currentConfessionId = null;
+    let currentEditConfessionId = null;
+    let currentFilter = "all";
+    let currentSearch = "";
+    let currentTrend = "latest";
+    let activeExpertSector = "mental health";
 
-    // Helper: generate unique ID
-    function uid() {
-        return Date.now() + '-' + Math.random().toString(36).substr(2, 8);
+    // Helper: unique ID
+    function uid() { return Date.now() + '-' + Math.random().toString(36).substr(2, 8); }
+
+    // Show toast
+    function showToast(msg) {
+        const toast = document.getElementById("toast");
+        toast.textContent = msg;
+        toast.style.opacity = "1";
+        setTimeout(() => toast.style.opacity = "0", 2500);
     }
 
-    // Get current user ID (persistent in localStorage)
-    let userId = localStorage.getItem('userId');
-    if (!userId) {
-        userId = 'user_' + Math.random().toString(36).substr(2, 8);
-        localStorage.setItem('userId', userId);
-    }
-
-    // ---------- Data operations ----------
-    async function saveConfession(confession) {
-        await stores.confessions.setItem(confession.id, confession);
-        return confession;
-    }
-
-    // Get non-expired public confessions
-    async function getPublicConfessions() {
-        const confs = [];
-        const now = Date.now();
-        await stores.confessions.iterate((value, key) => {
-            if (value.isPublic && !value.deleted) {
-                // Check expiration
-                if (now - value.timestamp < EXPIRATION_MS) {
-                    confs.push(value);
-                }
-            }
-        });
-        return confs.sort((a,b) => b.timestamp - a.timestamp);
-    }
-
-    async function getConfessionById(id) {
-        const confession = await stores.confessions.getItem(id);
-        if (!confession) return null;
-        // Check expiration
-        if (Date.now() - confession.timestamp >= EXPIRATION_MS) {
-            return null; // expired, treat as not found
+    // ---------- User authentication ----------
+    async function registerOrLogin(username, password) {
+        let user = await stores.users.getItem(username);
+        if (!user) {
+            user = { username, password, reputation: 0, createdAt: Date.now() };
+            await stores.users.setItem(username, user);
+            showToast("Account created! Welcome.");
+        } else if (user.password !== password) {
+            showToast("Wrong password.");
+            return null;
         }
-        return confession;
+        currentUser = user;
+        localStorage.setItem('currentUser', username);
+        document.getElementById("authBtn").innerHTML = `<i class="fas fa-user"></i> ${username} <i class="fas fa-chevron-down"></i>`;
+        document.getElementById("authBtn").onclick = () => showDashboard();
+        document.getElementById("authModal").classList.remove("active");
+        await loadUserData();
+        renderFeed();
+        return user;
     }
 
-    async function saveAdvice(advice) {
-        await stores.advice.setItem(advice.id, advice);
-        return advice;
+    function logout() {
+        currentUser = null;
+        localStorage.removeItem('currentUser');
+        document.getElementById("authBtn").innerHTML = "Sign In";
+        document.getElementById("authBtn").onclick = () => document.getElementById("authModal").classList.add("active");
+        renderFeed();
     }
 
-    async function getAdviceByConfession(confessionId) {
-        const list = [];
-        await stores.advice.iterate((value) => {
-            if (value.confessionId === confessionId && !value.deleted && !value.reported) list.push(value);
-        });
-        return list.sort((a,b) => b.timestamp - a.timestamp);
-    }
-
-    async function getAllAdvice() {
-        const list = [];
-        await stores.advice.iterate((value) => {
-            if (!value.deleted && !value.reported) list.push(value);
-        });
-        return list;
-    }
-
-    async function getVote(adviceId) {
-        const key = `${adviceId}_${userId}`;
-        return await stores.votes.getItem(key);
-    }
-
-    async function setVote(adviceId, voteType) {
-        const key = `${adviceId}_${userId}`;
-        await stores.votes.setItem(key, { adviceId, userId, voteType, timestamp: Date.now() });
-    }
-
-    async function removeVote(adviceId) {
-        const key = `${adviceId}_${userId}`;
-        await stores.votes.removeItem(key);
-    }
-
-    async function getAdviceVoteCount(adviceId) {
-        let up = 0, down = 0;
+    async function loadUserData() {
+        if (!currentUser) return;
+        // update reputation from votes
+        let rep = 0;
         await stores.votes.iterate((vote) => {
-            if (vote.adviceId === adviceId) {
-                if (vote.voteType === 'up') up++;
-                else if (vote.voteType === 'down') down++;
+            if (vote.authorId === currentUser.username && vote.voteType === 'up') rep++;
+            else if (vote.authorId === currentUser.username && vote.voteType === 'down') rep--;
+        });
+        currentUser.reputation = rep;
+        await stores.users.setItem(currentUser.username, currentUser);
+        document.getElementById("profileInfo").innerHTML = `
+            <p><strong>Username:</strong> ${currentUser.username}</p>
+            <p><strong>Reputation:</strong> ${currentUser.reputation} points</p>
+            <button id="logoutBtn" class="secondary-btn">Logout</button>
+        `;
+        document.getElementById("logoutBtn")?.addEventListener("click", logout);
+    }
+
+    function showDashboard() {
+        if (!currentUser) { showToast("Please sign in first"); return; }
+        loadUserData();
+        renderMyConfessions();
+        renderMyAdvice();
+        document.getElementById("feedView").classList.remove("active");
+        document.getElementById("detailView").classList.remove("active");
+        document.getElementById("dashboardView").classList.add("active");
+    }
+
+    async function renderMyConfessions() {
+        const myConfs = [];
+        await stores.confessions.iterate((conf) => {
+            if (conf.userId === currentUser.username && !conf.deleted && (Date.now() - conf.timestamp < EXPIRATION_MS)) {
+                myConfs.push(conf);
             }
         });
-        return { up, down, score: up - down };
-    }
-
-    async function reportAdvice(adviceId, reason = 'inappropriate') {
-        const key = `${adviceId}_${userId}`;
-        await stores.reports.setItem(key, { adviceId, userId, reason, timestamp: Date.now() });
-        const advice = await stores.advice.getItem(adviceId);
-        if (advice) {
-            advice.reported = true;
-            await stores.advice.setItem(adviceId, advice);
+        myConfs.sort((a,b)=>b.timestamp-a.timestamp);
+        if (myConfs.length === 0) {
+            document.getElementById("myConfessions").innerHTML = "<p>You haven't posted any confessions.</p>";
+            return;
         }
+        let html = '';
+        for (const conf of myConfs) {
+            const remaining = getRemainingTime(conf.timestamp);
+            html += `
+                <div class="confession-item" style="margin-bottom:1rem;">
+                    <div><strong>${conf.anonymous ? 'Anonymous' : 'You'}</strong> · ${conf.category}</div>
+                    <div>${conf.text.substring(0,100)}${conf.text.length>100?'…':''}</div>
+                    <div class="timestamp">${new Date(conf.timestamp).toLocaleString()} · <span class="expiry-badge">${remaining}</span></div>
+                    <div style="margin-top:0.5rem;">
+                        <button class="secondary-btn edit-confession" data-id="${conf.id}">Edit</button>
+                        <button class="danger-btn delete-confession" data-id="${conf.id}">Delete</button>
+                    </div>
+                </div>
+            `;
+        }
+        document.getElementById("myConfessions").innerHTML = html;
+        document.querySelectorAll('.edit-confession').forEach(btn => {
+            btn.addEventListener('click', () => openEditConfession(btn.getAttribute('data-id')));
+        });
+        document.querySelectorAll('.delete-confession').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (confirm("Delete this confession? All advice will also be removed.")) {
+                    const id = btn.getAttribute('data-id');
+                    const conf = await stores.confessions.getItem(id);
+                    if (conf && conf.userId === currentUser.username) {
+                        conf.deleted = true;
+                        await stores.confessions.setItem(id, conf);
+                        // also delete all advice for this confession
+                        await stores.advice.iterate((adv, key) => {
+                            if (adv.confessionId === id) stores.advice.removeItem(key);
+                        });
+                        showToast("Confession deleted.");
+                        renderMyConfessions();
+                        renderFeed();
+                    }
+                }
+            });
+        });
     }
 
-    // Helper: get remaining time string
+    async function renderMyAdvice() {
+        const myAdv = [];
+        await stores.advice.iterate((adv) => {
+            if (adv.userId === currentUser.username && !adv.deleted) myAdv.push(adv);
+        });
+        myAdv.sort((a,b)=>b.timestamp-a.timestamp);
+        if (myAdv.length === 0) {
+            document.getElementById("myAdvice").innerHTML = "<p>You haven't posted any advice.</p>";
+            return;
+        }
+        let html = '';
+        for (const adv of myAdv) {
+            const confession = await stores.confessions.getItem(adv.confessionId);
+            const votes = await getAdviceVoteCount(adv.id);
+            html += `
+                <div class="advice-item" style="margin-bottom:1rem;">
+                    <div><strong>To:</strong> ${confession ? (confession.anonymous ? 'Anonymous' : 'Someone') : 'Unknown'} (${adv.confessionId.substring(0,6)})</div>
+                    <div>${adv.content.substring(0,100)}${adv.content.length>100?'…':''}</div>
+                    <div class="advice-meta">👍 ${votes.score} points · ${new Date(adv.timestamp).toLocaleString()}</div>
+                    <button class="danger-btn delete-advice" data-id="${adv.id}">Delete</button>
+                </div>
+            `;
+        }
+        document.getElementById("myAdvice").innerHTML = html;
+        document.querySelectorAll('.delete-advice').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.getAttribute('data-id');
+                const adv = await stores.advice.getItem(id);
+                if (adv && adv.userId === currentUser.username) {
+                    adv.deleted = true;
+                    await stores.advice.setItem(id, adv);
+                    showToast("Advice deleted.");
+                    renderMyAdvice();
+                    if (currentConfessionId) await showConfessionDetail(currentConfessionId);
+                    renderFeed();
+                }
+            });
+        });
+    }
+
+    // ---------- Confession expiration ----------
     function getRemainingTime(timestamp) {
         const elapsed = Date.now() - timestamp;
         const remaining = EXPIRATION_MS - elapsed;
         if (remaining <= 0) return "Expired";
         const hours = Math.floor(remaining / (1000 * 60 * 60));
         const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-        if (hours > 0) return `${hours}h ${minutes}m remaining`;
-        return `${minutes}m remaining`;
+        if (hours > 0) return `${hours}h ${minutes}m left`;
+        return `${minutes}m left`;
     }
 
-    // ---------- AI advice generator (enhanced) ----------
+    // ---------- AI advice ----------
     function generateAIAdvice(text, category) {
         const lower = text.toLowerCase();
         if (lower.includes("suicidal") || lower.includes("kill myself") || lower.includes("end it")) {
-            return "⚠️ If you're having thoughts of harming yourself, please reach out immediately to a crisis helpline (e.g., 988 in US). You matter, and help is available. This is a serious matter – please talk to a professional right now.";
+            return "⚠️ If you're having thoughts of harming yourself, please reach out to a crisis helpline (e.g., 988). You matter, and help is available. Please talk to a professional immediately.";
         }
         const templates = {
             "mental health": "It's brave to share your mental health journey. Consider talking to a therapist or using grounding techniques. You are not alone, and seeking support is a sign of strength. 💙",
@@ -569,7 +612,7 @@
         return templates[category] || templates.other;
     }
 
-    // ---------- Expert advice database ----------
+    // ---------- Expert advice ----------
     const expertDB = {
         "mental health": { name: "Dr. Amara Chen, Clinical Psychologist", advice: "Your emotional well-being is paramount. If you're feeling overwhelmed, try the 5-4-3-2-1 grounding technique. Therapy is a sign of strength — there's no shame in seeking support." },
         "relationships": { name: "Luis M., Certified Relationship Coach", advice: "Healthy relationships require mutual respect and communication. If you're feeling unheard, consider writing a letter to express your needs. Boundaries protect your heart." },
@@ -577,181 +620,198 @@
         "finance": { name: "Omar F., CFP®", advice: "Financial peace is a marathon. Automate small savings, tackle high‑interest debt first, and avoid comparison. You are more than your net worth." },
         "health": { name: "Dr. Elena Vasquez, MD", advice: "Physical and mental wellness are intertwined. Prioritize sleep, hydration, and regular check‑ups. If something feels off, trust your intuition and see a doctor." }
     };
-    let activeExpertSector = "mental health";
-
     function renderExpertAdvice() {
         const expert = expertDB[activeExpertSector];
-        const html = `
+        document.getElementById("expertAdviceArea").innerHTML = `
             <div class="advice-item">
-                <strong>${expert.name}</strong><br>
-                ${expert.advice}
+                <strong>${expert.name}</strong><br>${expert.advice}
                 <div class="advice-meta">
-                    <span>✅ Verified expert • ${activeExpertSector}</span>
-                    <div class="votes">
-                        <button class="vote-btn expert-upvote"><i class="fas fa-thumbs-up"></i> Helpful</button>
-                        <button class="vote-btn expert-downvote"><i class="fas fa-thumbs-down"></i> Not helpful</button>
-                    </div>
+                    <span>✅ Verified expert</span>
+                    <div><button class="vote-btn expert-upvote"><i class="fas fa-thumbs-up"></i> Helpful</button>
+                    <button class="vote-btn expert-downvote"><i class="fas fa-thumbs-down"></i> Not helpful</button></div>
                 </div>
             </div>
         `;
-        document.getElementById("expertAdviceArea").innerHTML = html;
         document.querySelector('.expert-upvote')?.addEventListener('click', () => showToast("Thanks for rating this expert!"));
         document.querySelector('.expert-downvote')?.addEventListener('click', () => showToast("Feedback recorded."));
     }
 
-    // ---------- Feed rendering with reply buttons and advice counts ----------
-    let currentFilter = "all";
-
-    async function renderPublicFeed() {
-        const confessions = await getPublicConfessions();
-        let filtered = confessions;
-        if (currentFilter !== "all") {
-            filtered = confessions.filter(c => c.category === currentFilter);
+    // ---------- Voting & likes ----------
+    async function getAdviceVoteCount(adviceId) {
+        let up = 0, down = 0;
+        await stores.votes.iterate((vote) => {
+            if (vote.adviceId === adviceId) {
+                if (vote.voteType === 'up') up++;
+                else if (vote.voteType === 'down') down++;
+            }
+        });
+        return { up, down, score: up - down };
+    }
+    async function setVote(adviceId, voteType) {
+        const key = `${adviceId}_${currentUser?.username || 'anon'}`;
+        const existing = await stores.votes.getItem(key);
+        if (existing && existing.voteType === voteType) {
+            await stores.votes.removeItem(key);
+        } else {
+            await stores.votes.setItem(key, { adviceId, userId: currentUser?.username, voteType, authorId: null });
+            // update reputation of advice author
+            const advice = await stores.advice.getItem(adviceId);
+            if (advice && advice.userId) {
+                const author = await stores.users.getItem(advice.userId);
+                if (author) {
+                    if (voteType === 'up') author.reputation = (author.reputation || 0) + 1;
+                    else if (voteType === 'down') author.reputation = (author.reputation || 0) - 1;
+                    await stores.users.setItem(author.username, author);
+                    if (currentUser?.username === author.username) currentUser.reputation = author.reputation;
+                }
+            }
         }
+    }
+
+    async function likeConfession(confessionId) {
+        if (!currentUser) { showToast("Sign in to like"); return false; }
+        const key = `${confessionId}_${currentUser.username}`;
+        const existing = await stores.likes.getItem(key);
+        if (existing) {
+            await stores.likes.removeItem(key);
+            return false;
+        } else {
+            await stores.likes.setItem(key, { confessionId, userId: currentUser.username });
+            return true;
+        }
+    }
+    async function getConfessionLikes(confessionId) {
+        let count = 0;
+        await stores.likes.iterate((like) => { if (like.confessionId === confessionId) count++; });
+        return count;
+    }
+
+    // ---------- Feed rendering ----------
+    async function renderFeed() {
+        const confessions = [];
+        const now = Date.now();
+        await stores.confessions.iterate((conf) => {
+            if (conf.isPublic && !conf.deleted && (now - conf.timestamp < EXPIRATION_MS)) confessions.push(conf);
+        });
+        let filtered = confessions;
+        if (currentFilter !== "all") filtered = filtered.filter(c => c.category === currentFilter);
+        if (currentSearch) filtered = filtered.filter(c => c.text.toLowerCase().includes(currentSearch.toLowerCase()));
+        if (currentTrend === "trending") {
+            const adviceCounts = {};
+            await stores.advice.iterate((adv) => { if (!adv.deleted && !adv.reported) adviceCounts[adv.confessionId] = (adviceCounts[adv.confessionId] || 0) + 1; });
+            filtered.sort((a,b) => (adviceCounts[b.id]||0) - (adviceCounts[a.id]||0));
+        } else if (currentTrend === "most-liked") {
+            const likeCounts = {};
+            await stores.likes.iterate((like) => { likeCounts[like.confessionId] = (likeCounts[like.confessionId] || 0) + 1; });
+            filtered.sort((a,b) => (likeCounts[b.id]||0) - (likeCounts[a.id]||0));
+        } else {
+            filtered.sort((a,b) => b.timestamp - a.timestamp);
+        }
+
         if (filtered.length === 0) {
-            document.getElementById("publicFeed").innerHTML = "<p>No public confessions yet. Share yours to start the conversation.</p>";
+            document.getElementById("publicFeed").innerHTML = "<p>No confessions found.</p>";
             return;
         }
         let html = '';
         for (const conf of filtered) {
             const adviceList = await getAdviceByConfession(conf.id);
             const adviceCount = adviceList.length;
-            const firstAdvice = adviceCount > 0 ? adviceList[0] : null;
+            const likes = await getConfessionLikes(conf.id);
+            const userLiked = currentUser ? (await stores.likes.getItem(`${conf.id}_${currentUser.username}`)) : false;
             const remaining = getRemainingTime(conf.timestamp);
-            const expiryClass = remaining === "Expired" ? "expired-badge" : "";
             html += `
                 <div class="confession-item" data-id="${conf.id}">
                     <div class="confession-header">
                         <div><strong>${conf.anonymous ? 'Anonymous' : 'Someone'}</strong> · ${conf.category}</div>
                         <div class="confession-stats">
-                            <span><i class="fas fa-comment"></i> ${adviceCount} advice</span>
-                            <button class="reply-btn" data-id="${conf.id}" data-category="${conf.category}">💬 Reply</button>
-                            <span class="expiry-badge ${expiryClass}"><i class="fas fa-hourglass-half"></i> ${remaining}</span>
+                            <span><i class="fas fa-comment"></i> ${adviceCount}</span>
+                            <span class="like-btn ${userLiked ? 'liked' : ''}" data-id="${conf.id}"><i class="fas fa-heart"></i> ${likes}</span>
+                            <button class="reply-btn" data-id="${conf.id}">💬 Reply</button>
+                            <span class="expiry-badge">${remaining}</span>
                         </div>
                     </div>
-                    <div>${conf.text.substring(0, 200)}${conf.text.length > 200 ? '…' : ''}</div>
+                    <div>${conf.text.substring(0,200)}${conf.text.length>200?'…':''}</div>
                     <div class="timestamp">${new Date(conf.timestamp).toLocaleString()}</div>
-                    ${firstAdvice ? `
-                        <div class="advice-preview">
-                            <i class="fas fa-quote-left"></i> ${firstAdvice.content.substring(0, 100)}${firstAdvice.content.length > 100 ? '…' : ''}
-                            ${adviceCount > 1 ? `<a href="#" class="see-more" data-id="${conf.id}"> See more (${adviceCount-1} more)</a>` : ''}
-                        </div>
-                    ` : ''}
                 </div>
             `;
         }
         document.getElementById("publicFeed").innerHTML = html;
-        // Attach click handlers
         document.querySelectorAll('.confession-item').forEach(el => {
             el.addEventListener('click', (e) => {
-                if (e.target.classList.contains('reply-btn') || e.target.classList.contains('see-more')) return;
-                const id = el.getAttribute('data-id');
-                showConfessionDetail(id);
+                if (e.target.classList.contains('reply-btn') || e.target.classList.contains('like-btn')) return;
+                showConfessionDetail(el.getAttribute('data-id'));
             });
         });
-        // Reply buttons
         document.querySelectorAll('.reply-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', (e) => { e.stopPropagation(); openReplyModal(btn.getAttribute('data-id')); });
+        });
+        document.querySelectorAll('.like-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
-                const confessionId = btn.getAttribute('data-id');
-                openReplyModal(confessionId);
+                const id = btn.getAttribute('data-id');
+                const liked = await likeConfession(id);
+                const newCount = await getConfessionLikes(id);
+                btn.innerHTML = `<i class="fas fa-heart"></i> ${newCount}`;
+                if (liked) btn.classList.add('liked');
+                else btn.classList.remove('liked');
             });
         });
-        // See more links
-        document.querySelectorAll('.see-more').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const confessionId = link.getAttribute('data-id');
-                showConfessionDetail(confessionId);
-            });
-        });
     }
 
-    // ---------- Modal for quick reply ----------
-    let currentReplyConfessionId = null;
-    function openReplyModal(confessionId) {
-        currentReplyConfessionId = confessionId;
-        const modal = document.getElementById("replyModal");
-        document.getElementById("modalAdviceText").value = "";
-        modal.classList.add("active");
-    }
-    function closeReplyModal() {
-        document.getElementById("replyModal").classList.remove("active");
-        currentReplyConfessionId = null;
-    }
-    async function submitReply() {
-        const content = document.getElementById("modalAdviceText").value.trim();
-        if (!content) { showToast("Please write your advice."); return; }
-        if (!currentReplyConfessionId) return;
-        const advice = {
-            id: uid(),
-            confessionId: currentReplyConfessionId,
-            type: 'community',
-            content,
-            authorName: "Community member",
-            timestamp: Date.now(),
-            userId,
-            deleted: false,
-            reported: false
-        };
-        await saveAdvice(advice);
-        showToast("Advice posted!");
-        closeReplyModal();
-        await renderPublicFeed(); // refresh feed to show new advice count and preview
-        // Also if detail view is open for this confession, refresh it
-        if (document.getElementById("detailView").classList.contains("active") && currentConfessionId === currentReplyConfessionId) {
-            await showConfessionDetail(currentReplyConfessionId);
-        }
-    }
-    document.getElementById("modalCancel").addEventListener("click", closeReplyModal);
-    document.getElementById("modalSubmit").addEventListener("click", submitReply);
-
-    // ---------- Confession detail view ----------
-    let currentConfessionId = null;
-
+    // ---------- Confession detail ----------
     async function showConfessionDetail(confessionId) {
-        const confession = await getConfessionById(confessionId);
-        if (!confession) {
-            showToast("This confession has expired or does not exist.");
+        const confession = await stores.confessions.getItem(confessionId);
+        if (!confession || (Date.now() - confession.timestamp >= EXPIRATION_MS)) {
+            showToast("Confession expired or not found");
             document.getElementById("backToFeed").click();
             return;
         }
         currentConfessionId = confessionId;
         document.getElementById("detailTitle").innerHTML = `Confession · ${confession.anonymous ? 'Anonymous' : 'Someone'}`;
         const remaining = getRemainingTime(confession.timestamp);
+        let actions = '';
+        if (currentUser && confession.userId === currentUser.username) {
+            actions = `<button id="editConfessionBtn" class="secondary-btn">Edit</button>
+                       <button id="deleteConfessionBtn" class="danger-btn">Delete</button>`;
+        }
         document.getElementById("detailConfession").innerHTML = `
             <div><strong>Category:</strong> ${confession.category}</div>
-            <div style="margin-top: 0.5rem;">${confession.text}</div>
-            <div class="timestamp">${new Date(confession.timestamp).toLocaleString()} · <span class="expiry-badge"><i class="fas fa-hourglass-half"></i> ${remaining}</span></div>
+            <div>${confession.text}</div>
+            <div class="timestamp">${new Date(confession.timestamp).toLocaleString()} · <span class="expiry-badge">${remaining}</span></div>
+            <div>${actions}</div>
         `;
-
+        if (currentUser && confession.userId === currentUser.username) {
+            document.getElementById("editConfessionBtn")?.addEventListener("click", () => openEditConfession(confessionId));
+            document.getElementById("deleteConfessionBtn")?.addEventListener("click", async () => {
+                if (confirm("Delete this confession? All advice will also be removed.")) {
+                    confession.deleted = true;
+                    await stores.confessions.setItem(confessionId, confession);
+                    await stores.advice.iterate((adv, key) => { if (adv.confessionId === confessionId) stores.advice.removeItem(key); });
+                    showToast("Confession deleted.");
+                    document.getElementById("backToFeed").click();
+                }
+            });
+        }
         // AI advice
         const allAdvice = await getAdviceByConfession(confessionId);
         const aiAdvice = allAdvice.find(a => a.type === 'ai');
-        if (aiAdvice) {
-            document.getElementById("detailAIAdvice").innerHTML = `<div class="advice-item">${aiAdvice.content}<div class="advice-meta">🤖 AI advice</div></div>`;
-        } else {
-            document.getElementById("detailAIAdvice").innerHTML = "<p>No AI advice yet.</p>";
-        }
-
+        document.getElementById("detailAIAdvice").innerHTML = aiAdvice ? `<div class="advice-item">${aiAdvice.content}<div class="advice-meta">🤖 AI advice</div></div>` : "<p>No AI advice yet.</p>";
         // Community advice
         const communityAdvice = allAdvice.filter(a => a.type === 'community');
-        if (communityAdvice.length === 0) {
-            document.getElementById("detailCommunityAdvice").innerHTML = "<p>No community advice yet. Be the first to help!</p>";
-        } else {
-            let adviceHtml = '';
+        if (communityAdvice.length === 0) document.getElementById("detailCommunityAdvice").innerHTML = "<p>No community advice yet.</p>";
+        else {
+            let advHtml = '';
             for (const adv of communityAdvice) {
                 const votes = await getAdviceVoteCount(adv.id);
-                const userVote = await getVote(adv.id);
+                const userVote = currentUser ? await stores.votes.getItem(`${adv.id}_${currentUser.username}`) : null;
                 const upActive = userVote?.voteType === 'up' ? 'active' : '';
                 const downActive = userVote?.voteType === 'down' ? 'active' : '';
-                adviceHtml += `
+                advHtml += `
                     <div class="advice-item" data-id="${adv.id}">
                         <div><strong>${adv.authorName || 'Anonymous'}</strong> · ${new Date(adv.timestamp).toLocaleString()}</div>
                         <div>${adv.content}</div>
                         <div class="advice-meta">
-                            <span><i class="fas fa-heart"></i> ${votes.score} points (${votes.up} up, ${votes.down} down)</span>
+                            <span><i class="fas fa-heart"></i> ${votes.score} (${votes.up}👍, ${votes.down}👎)</span>
                             <div class="votes">
                                 <button class="vote-btn upvote ${upActive}" data-id="${adv.id}"><i class="fas fa-arrow-up"></i> Up</button>
                                 <button class="vote-btn downvote ${downActive}" data-id="${adv.id}"><i class="fas fa-arrow-down"></i> Down</button>
@@ -761,203 +821,264 @@
                     </div>
                 `;
             }
-            document.getElementById("detailCommunityAdvice").innerHTML = adviceHtml;
+            document.getElementById("detailCommunityAdvice").innerHTML = advHtml;
             attachDetailVoteHandlers();
             attachDetailReportHandlers();
         }
-
-        // Switch views
         document.getElementById("feedView").classList.remove("active");
         document.getElementById("detailView").classList.add("active");
     }
 
+    async function getAdviceByConfession(confessionId) {
+        const list = [];
+        await stores.advice.iterate((value) => {
+            if (value.confessionId === confessionId && !value.deleted && !value.reported) list.push(value);
+        });
+        return list.sort((a,b)=>b.timestamp-a.timestamp);
+    }
+
     function attachDetailVoteHandlers() {
-        const upBtns = document.querySelectorAll('#detailCommunityAdvice .upvote');
-        const downBtns = document.querySelectorAll('#detailCommunityAdvice .downvote');
-        upBtns.forEach(btn => {
+        document.querySelectorAll('#detailCommunityAdvice .upvote').forEach(btn => {
             btn.removeEventListener('click', handleUpvote);
             btn.addEventListener('click', handleUpvote);
         });
-        downBtns.forEach(btn => {
+        document.querySelectorAll('#detailCommunityAdvice .downvote').forEach(btn => {
             btn.removeEventListener('click', handleDownvote);
             btn.addEventListener('click', handleDownvote);
         });
     }
-
     async function handleUpvote(e) {
-        const btn = e.currentTarget;
-        const adviceId = btn.getAttribute('data-id');
-        const existing = await getVote(adviceId);
-        if (existing && existing.voteType === 'up') {
-            await removeVote(adviceId);
-        } else {
-            if (existing && existing.voteType === 'down') {
-                await removeVote(adviceId);
-            }
-            await setVote(adviceId, 'up');
-        }
+        if (!currentUser) { showToast("Sign in to vote"); return; }
+        const adviceId = e.currentTarget.getAttribute('data-id');
+        await setVote(adviceId, 'up');
         if (currentConfessionId) await showConfessionDetail(currentConfessionId);
     }
-
     async function handleDownvote(e) {
-        const btn = e.currentTarget;
-        const adviceId = btn.getAttribute('data-id');
-        const existing = await getVote(adviceId);
-        if (existing && existing.voteType === 'down') {
-            await removeVote(adviceId);
-        } else {
-            if (existing && existing.voteType === 'up') {
-                await removeVote(adviceId);
-            }
-            await setVote(adviceId, 'down');
-        }
+        if (!currentUser) { showToast("Sign in to vote"); return; }
+        const adviceId = e.currentTarget.getAttribute('data-id');
+        await setVote(adviceId, 'down');
         if (currentConfessionId) await showConfessionDetail(currentConfessionId);
     }
-
     function attachDetailReportHandlers() {
-        const reportBtns = document.querySelectorAll('#detailCommunityAdvice .report-btn');
-        reportBtns.forEach(btn => {
-            btn.removeEventListener('click', handleReport);
-            btn.addEventListener('click', handleReport);
+        document.querySelectorAll('#detailCommunityAdvice .report-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const adviceId = btn.getAttribute('data-id');
+                const advice = await stores.advice.getItem(adviceId);
+                if (advice) {
+                    advice.reported = true;
+                    await stores.advice.setItem(adviceId, advice);
+                    showToast("Advice reported. Thank you.");
+                    if (currentConfessionId) await showConfessionDetail(currentConfessionId);
+                }
+            });
         });
     }
 
-    async function handleReport(e) {
-        const btn = e.currentTarget;
-        const adviceId = btn.getAttribute('data-id');
-        await reportAdvice(adviceId, 'inappropriate');
-        showToast("Advice reported. Thank you for helping keep the community safe.");
-        if (currentConfessionId) await showConfessionDetail(currentConfessionId);
-    }
-
-    // ---------- Submit new confession ----------
+    // ---------- Submit confession ----------
     document.getElementById("submitConfession").addEventListener("click", async () => {
+        if (!currentUser) { showToast("Please sign in first"); return; }
         const text = document.getElementById("confessionText").value.trim();
         if (!text) { showToast("Please write your confession."); return; }
         const category = document.getElementById("category").value;
         const anonymous = document.getElementById("anonymousCheckbox").checked;
         const isPublic = document.getElementById("publicCheckbox").checked;
-
         const confession = {
-            id: uid(),
-            text,
-            category,
-            anonymous,
-            isPublic,
-            timestamp: Date.now(),
-            userId,
-            deleted: false
+            id: uid(), text, category, anonymous, isPublic, timestamp: Date.now(),
+            userId: currentUser.username, deleted: false
         };
-        await saveConfession(confession);
-
-        // Generate and save AI advice
-        const aiAdviceText = generateAIAdvice(text, category);
-        const aiAdvice = {
-            id: uid(),
-            confessionId: confession.id,
-            type: 'ai',
-            content: aiAdviceText,
-            timestamp: Date.now(),
-            deleted: false,
-            reported: false
-        };
-        await saveAdvice(aiAdvice);
-
-        showToast("Confession submitted! AI advice generated. It will expire in 48 hours.");
+        await stores.confessions.setItem(confession.id, confession);
+        const aiAdvice = { id: uid(), confessionId: confession.id, type: 'ai', content: generateAIAdvice(text, category), timestamp: Date.now(), deleted: false, reported: false };
+        await stores.advice.setItem(aiAdvice.id, aiAdvice);
+        showToast("Confession posted! AI advice generated.");
         document.getElementById("confessionText").value = "";
-        await renderPublicFeed();
+        renderFeed();
     });
 
-    // ---------- Post community advice from detail view ----------
+    // ---------- Post advice (detail) ----------
     document.getElementById("postDetailAdvice").addEventListener("click", async () => {
+        if (!currentUser) { showToast("Sign in to post advice"); return; }
         const content = document.getElementById("detailAdviceText").value.trim();
-        if (!content) { showToast("Please write your advice."); return; }
-        if (!currentConfessionId) return;
+        if (!content || !currentConfessionId) return;
         const advice = {
-            id: uid(),
-            confessionId: currentConfessionId,
-            type: 'community',
-            content,
-            authorName: "Community member",
-            timestamp: Date.now(),
-            userId,
-            deleted: false,
-            reported: false
+            id: uid(), confessionId: currentConfessionId, type: 'community', content,
+            authorName: currentUser.username, timestamp: Date.now(), userId: currentUser.username,
+            deleted: false, reported: false
         };
-        await saveAdvice(advice);
+        await stores.advice.setItem(advice.id, advice);
         showToast("Advice posted!");
         document.getElementById("detailAdviceText").value = "";
         await showConfessionDetail(currentConfessionId);
-        await renderPublicFeed(); // update feed counts
+        renderFeed();
     });
+
+    // ---------- Reply modal ----------
+    let currentReplyConfessionId = null;
+    function openReplyModal(confessionId) {
+        if (!currentUser) { showToast("Sign in to reply"); return; }
+        currentReplyConfessionId = confessionId;
+        document.getElementById("modalAdviceText").value = "";
+        document.getElementById("replyModal").classList.add("active");
+    }
+    document.getElementById("modalSubmit").addEventListener("click", async () => {
+        const content = document.getElementById("modalAdviceText").value.trim();
+        if (!content || !currentReplyConfessionId) return;
+        const advice = {
+            id: uid(), confessionId: currentReplyConfessionId, type: 'community', content,
+            authorName: currentUser.username, timestamp: Date.now(), userId: currentUser.username,
+            deleted: false, reported: false
+        };
+        await stores.advice.setItem(advice.id, advice);
+        showToast("Advice posted!");
+        document.getElementById("replyModal").classList.remove("active");
+        renderFeed();
+        if (currentConfessionId === currentReplyConfessionId) await showConfessionDetail(currentConfessionId);
+    });
+    document.getElementById("modalCancel").addEventListener("click", () => document.getElementById("replyModal").classList.remove("active"));
+
+    // ---------- Edit confession ----------
+    function openEditConfession(confessionId) {
+        stores.confessions.getItem(confessionId).then(conf => {
+            if (!conf || conf.userId !== currentUser.username) return;
+            currentEditConfessionId = confessionId;
+            document.getElementById("editConfessionText").value = conf.text;
+            const categorySelect = document.getElementById("editCategory");
+            categorySelect.innerHTML = '';
+            ['mental health','relationships','career','finance','health','other'].forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                if (c === conf.category) opt.selected = true;
+                categorySelect.appendChild(opt);
+            });
+            document.getElementById("editConfessionModal").classList.add("active");
+        });
+    }
+    document.getElementById("saveEditConfession").addEventListener("click", async () => {
+        const newText = document.getElementById("editConfessionText").value.trim();
+        const newCategory = document.getElementById("editCategory").value;
+        if (!newText) return;
+        const confession = await stores.confessions.getItem(currentEditConfessionId);
+        if (confession && confession.userId === currentUser.username) {
+            confession.text = newText;
+            confession.category = newCategory;
+            await stores.confessions.setItem(currentEditConfessionId, confession);
+            showToast("Confession updated.");
+            document.getElementById("editConfessionModal").classList.remove("active");
+            if (currentConfessionId === currentEditConfessionId) await showConfessionDetail(currentEditConfessionId);
+            renderFeed();
+        }
+    });
+    document.getElementById("cancelEditConfession").addEventListener("click", () => document.getElementById("editConfessionModal").classList.remove("active"));
 
     // ---------- Back to feed ----------
-    document.getElementById("backToFeed").addEventListener("click", async () => {
-        document.getElementById("feedView").classList.add("active");
+    document.getElementById("backToFeed").addEventListener("click", () => {
         document.getElementById("detailView").classList.remove("active");
+        document.getElementById("feedView").classList.add("active");
         currentConfessionId = null;
-        await renderPublicFeed();
+        renderFeed();
+    });
+    document.getElementById("backToFeedFromDashboard").addEventListener("click", () => {
+        document.getElementById("dashboardView").classList.remove("active");
+        document.getElementById("feedView").classList.add("active");
+        renderFeed();
     });
 
-    // ---------- Filter chips ----------
-    const filterChips = document.querySelectorAll('#categoryFilter .filter-chip');
-    filterChips.forEach(chip => {
+    // ---------- Filters ----------
+    document.querySelectorAll('#categoryFilter .filter-chip').forEach(chip => {
         chip.addEventListener('click', () => {
-            filterChips.forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('#categoryFilter .filter-chip').forEach(c => c.classList.remove('active'));
             chip.classList.add('active');
             currentFilter = chip.getAttribute('data-filter');
-            renderPublicFeed();
+            renderFeed();
         });
     });
-
-    // ---------- Expert sector switching ----------
-    const expertChips = document.querySelectorAll('#expertSectors .filter-chip');
-    expertChips.forEach(chip => {
+    document.querySelectorAll('#trendingFilter .trending-chip').forEach(chip => {
         chip.addEventListener('click', () => {
-            expertChips.forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('#trendingFilter .trending-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            currentTrend = chip.getAttribute('data-trend');
+            renderFeed();
+        });
+    });
+    document.getElementById("searchBtn").addEventListener("click", () => {
+        currentSearch = document.getElementById("searchInput").value.trim();
+        renderFeed();
+    });
+    document.getElementById("searchInput").addEventListener("keypress", (e) => { if (e.key === 'Enter') document.getElementById("searchBtn").click(); });
+    document.querySelectorAll('#expertSectors .filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('#expertSectors .filter-chip').forEach(c => c.classList.remove('active'));
             chip.classList.add('active');
             activeExpertSector = chip.getAttribute('data-sector');
             renderExpertAdvice();
         });
     });
 
-    // ---------- Theme toggle ----------
+    // ---------- Notifications (simulated) ----------
+    async function checkNotifications() {
+        if (!currentUser) return;
+        let count = 0;
+        await stores.notifications.iterate((n) => { if (n.userId === currentUser.username && !n.read) count++; });
+        const badge = document.getElementById("notificationCount");
+        if (count > 0) { badge.textContent = count; badge.style.display = "flex"; }
+        else badge.style.display = "none";
+    }
+    document.getElementById("notificationIcon").addEventListener("click", async () => {
+        if (!currentUser) { showToast("Sign in to see notifications"); return; }
+        const list = [];
+        await stores.notifications.iterate((n) => { if (n.userId === currentUser.username) list.push(n); });
+        list.sort((a,b)=>b.timestamp-a.timestamp);
+        const html = list.length ? list.map(n => `<div>${n.message} - ${new Date(n.timestamp).toLocaleString()}</div>`).join('') : "<p>No notifications</p>";
+        document.getElementById("notificationsList").innerHTML = html;
+        document.getElementById("notificationsModal").classList.add("active");
+        // mark as read
+        for (const n of list) { n.read = true; await stores.notifications.setItem(n.id, n); }
+        checkNotifications();
+    });
+    document.getElementById("clearNotifications").addEventListener("click", async () => {
+        await stores.notifications.clear();
+        checkNotifications();
+        document.getElementById("notificationsList").innerHTML = "<p>No notifications</p>";
+    });
+    document.getElementById("closeNotifications").addEventListener("click", () => document.getElementById("notificationsModal").classList.remove("active"));
+
+    // ---------- Auth modal ----------
+    document.getElementById("authBtn").onclick = () => document.getElementById("authModal").classList.add("active");
+    document.getElementById("authSubmit").onclick = async () => {
+        const username = document.getElementById("authUsername").value.trim();
+        const password = document.getElementById("authPassword").value;
+        if (!username || !password) { showToast("Enter username and password"); return; }
+        await registerOrLogin(username, password);
+    };
+
+    // ---------- Theme & init ----------
     const themeToggle = document.getElementById("themeToggle");
     themeToggle.addEventListener("click", () => {
         document.body.classList.toggle("dark");
-        const icon = themeToggle.querySelector("i");
-        if (document.body.classList.contains("dark")) {
-            icon.className = "fas fa-sun";
-            themeToggle.innerHTML = '<i class="fas fa-sun"></i> Light mode';
-        } else {
-            icon.className = "fas fa-moon";
-            themeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark mode';
-        }
         localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+        themeToggle.innerHTML = document.body.classList.contains('dark') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
     });
-    if (localStorage.getItem('darkMode') === 'true') {
-        document.body.classList.add('dark');
-        themeToggle.innerHTML = '<i class="fas fa-sun"></i> Light mode';
-    } else {
-        themeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark mode';
-    }
+    if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark');
+    themeToggle.innerHTML = document.body.classList.contains('dark') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
 
-    // ---------- Toast ----------
-    function showToast(msg) {
-        const toast = document.getElementById("toast");
-        toast.textContent = msg;
-        toast.style.opacity = "1";
-        setTimeout(() => { toast.style.opacity = "0"; }, 2500);
-    }
-
-    // ---------- Initial load ----------
     async function init() {
-        await renderPublicFeed();
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+            const user = await stores.users.getItem(savedUser);
+            if (user) currentUser = user;
+        }
+        if (currentUser) {
+            document.getElementById("authBtn").innerHTML = `<i class="fas fa-user"></i> ${currentUser.username} <i class="fas fa-chevron-down"></i>`;
+            document.getElementById("authBtn").onclick = () => showDashboard();
+            await loadUserData();
+        } else {
+            document.getElementById("authBtn").innerHTML = "Sign In";
+            document.getElementById("authBtn").onclick = () => document.getElementById("authModal").classList.add("active");
+        }
+        renderFeed();
         renderExpertAdvice();
-        // Optional: periodic cleanup every hour (just re-renders, filtering on fetch)
-        setInterval(async () => {
-            await renderPublicFeed();
-        }, 60 * 60 * 1000);
+        setInterval(() => { renderFeed(); checkNotifications(); }, 60000);
+        checkNotifications();
     }
     init();
 </script>
