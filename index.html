@@ -3,82 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Whisper · Confession & Advice Hub</title>
+    <title>Whisper · Genuine Confession & Advice Hub</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        :root {
-            --bg-light: #f9fafc;
-            --card-light: #ffffff;
-            --text-light: #1e293b;
-            --border-light: #e2e8f0;
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --secondary: #8b5cf6;
-            --danger: #ef4444;
-            --success: #10b981;
-            --warning: #f59e0b;
-        }
-        body.dark {
-            --bg-light: #0f172a;
-            --card-light: #1e293b;
-            --text-light: #f1f5f9;
-            --border-light: #334155;
-        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            transition: background 0.3s, color 0.2s;
         }
+
+        :root {
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --border: #e2e8f0;
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        body.dark {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f1f5f9;
+            --border: #334155;
+        }
+
         body {
-            background: var(--bg-light);
-            color: var(--text-light);
+            background: var(--bg);
+            color: var(--text);
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             line-height: 1.5;
-            padding: 2rem 1rem;
+            padding: 1rem;
+            transition: background 0.2s, color 0.2s;
         }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
         }
-        /* header */
+
+        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
             flex-wrap: wrap;
             gap: 1rem;
+            margin-bottom: 2rem;
         }
+
         .logo h1 {
             font-size: 2rem;
-            font-weight: 700;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
         }
+
         .logo p {
             font-size: 0.9rem;
             opacity: 0.8;
         }
+
         .theme-toggle {
-            background: var(--card-light);
-            border: 1px solid var(--border-light);
+            background: var(--card);
+            border: 1px solid var(--border);
             border-radius: 2rem;
             padding: 0.5rem 1rem;
             cursor: pointer;
             font-weight: 500;
+            color: var(--text);
         }
-        /* cards */
+
+        /* Cards */
         .card {
-            background: var(--card-light);
+            background: var(--card);
             border-radius: 1.5rem;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             box-shadow: 0 4px 6px -2px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.1);
-            border: 1px solid var(--border-light);
+            border: 1px solid var(--border);
         }
+
         h2 {
             font-size: 1.5rem;
             margin-bottom: 1rem;
@@ -86,27 +96,19 @@
             align-items: center;
             gap: 0.5rem;
         }
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-        @media (max-width: 768px) {
-            .grid-2 {
-                grid-template-columns: 1fr;
-            }
-        }
-        /* forms */
+
+        /* Forms */
         input, textarea, select {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid var(--border-light);
+            border: 1px solid var(--border);
             border-radius: 1rem;
-            background: var(--bg-light);
-            color: var(--text-light);
+            background: var(--bg);
+            color: var(--text);
             font-family: inherit;
             margin-bottom: 1rem;
         }
+
         button {
             background: var(--primary);
             color: white;
@@ -117,22 +119,26 @@
             cursor: pointer;
             transition: 0.2s;
         }
+
         button:hover {
             background: var(--primary-dark);
         }
+
         .secondary-btn {
             background: transparent;
-            border: 1px solid var(--border-light);
-            color: var(--text-light);
+            border: 1px solid var(--border);
+            color: var(--text);
         }
-        /* advice items */
+
+        /* Advice items */
         .advice-item {
-            background: var(--bg-light);
+            background: var(--bg);
             border-radius: 1rem;
             padding: 1rem;
             margin-bottom: 1rem;
             border-left: 4px solid var(--primary);
         }
+
         .advice-meta {
             display: flex;
             justify-content: space-between;
@@ -140,53 +146,85 @@
             font-size: 0.8rem;
             margin-top: 0.5rem;
             color: #64748b;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
+
         .votes {
             display: flex;
             gap: 1rem;
+            align-items: center;
         }
+
         .vote-btn {
-            cursor: pointer;
             background: none;
             border: none;
-            padding: 0;
-            color: var(--text-light);
-            opacity: 0.7;
+            cursor: pointer;
+            color: var(--text);
+            opacity: 0.6;
+            font-size: 0.9rem;
         }
-        .vote-btn:hover { opacity: 1; }
-        .upvote.active { color: var(--success); }
-        .downvote.active { color: var(--danger); }
-        .sector-pills {
+
+        .vote-btn:hover {
+            opacity: 1;
+        }
+
+        .vote-btn.active {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        .report-btn {
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* Feed */
+        .confession-feed {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .confession-item {
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        .confession-item:hover {
+            background: rgba(59,130,246,0.05);
+            padding-left: 0.5rem;
+        }
+
+        .filter-bar {
             display: flex;
-            flex-wrap: wrap;
             gap: 0.5rem;
+            flex-wrap: wrap;
             margin-bottom: 1rem;
         }
-        .pill {
-            background: var(--bg-light);
-            padding: 0.3rem 1rem;
+
+        .filter-chip {
+            background: var(--bg);
+            border: 1px solid var(--border);
             border-radius: 2rem;
-            font-size: 0.8rem;
+            padding: 0.3rem 1rem;
             cursor: pointer;
-            border: 1px solid var(--border-light);
+            font-size: 0.8rem;
         }
-        .pill.active {
+
+        .filter-chip.active {
             background: var(--primary);
             color: white;
             border-color: var(--primary);
         }
-        .confession-feed {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .confession-item {
-            border-bottom: 1px solid var(--border-light);
-            padding: 1rem 0;
-        }
+
         .timestamp {
             font-size: 0.7rem;
             opacity: 0.6;
         }
+
         .toast {
             position: fixed;
             bottom: 20px;
@@ -202,6 +240,31 @@
             transition: opacity 0.3s;
             pointer-events: none;
         }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            color: var(--primary);
+        }
+
+        /* View switching */
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 1rem;
+            }
+            h2 {
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -214,11 +277,11 @@
         <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i> Dark mode</button>
     </div>
 
-    <div class="grid-2">
-        <!-- Left column: confession form -->
+    <!-- Main Feed View -->
+    <div id="feedView" class="view active">
         <div class="card">
             <h2><i class="fas fa-pen-fancy"></i> Write your confession</h2>
-            <textarea id="confessionText" rows="5" placeholder="What's on your mind? I feel... I need advice about..."></textarea>
+            <textarea id="confessionText" rows="4" placeholder="What's on your mind? I feel... I need advice about..."></textarea>
             <select id="category">
                 <option value="mental health">🧠 Mental Health</option>
                 <option value="relationships">❤️ Relationships</option>
@@ -230,61 +293,79 @@
             <label><input type="checkbox" id="anonymousCheckbox"> Post anonymously</label>
             <label><input type="checkbox" id="publicCheckbox" checked> Make public (visible to community)</label>
             <button id="submitConfession">Submit & get AI advice</button>
-            <div style="margin-top: 1rem; font-size:0.8rem;"><i class="fas fa-shield-alt"></i> Your privacy matters. You control what's shared.</div>
         </div>
 
-        <!-- Right column: AI advice + expert advice -->
-        <div>
-            <div class="card">
-                <h2><i class="fas fa-robot"></i> AI advice</h2>
-                <div id="aiAdviceArea">✨ Submit a confession to receive instant, empathetic advice.</div>
+        <div class="card">
+            <h2><i class="fas fa-newspaper"></i> Public confessions</h2>
+            <div class="filter-bar" id="categoryFilter">
+                <button class="filter-chip active" data-filter="all">All</button>
+                <button class="filter-chip" data-filter="mental health">🧠 Mental Health</button>
+                <button class="filter-chip" data-filter="relationships">❤️ Relationships</button>
+                <button class="filter-chip" data-filter="career">💼 Career</button>
+                <button class="filter-chip" data-filter="finance">💰 Finance</button>
+                <button class="filter-chip" data-filter="health">🏥 Health</button>
+                <button class="filter-chip" data-filter="other">🌟 Other</button>
             </div>
-            <div class="card">
-                <h2><i class="fas fa-user-md"></i> Experts advice</h2>
-                <div class="sector-pills" id="expertSectors">
-                    <button class="pill" data-sector="mental health">🧠 Mental Health</button>
-                    <button class="pill" data-sector="relationships">❤️ Relationships</button>
-                    <button class="pill" data-sector="career">💼 Career</button>
-                    <button class="pill" data-sector="finance">💰 Finance</button>
-                    <button class="pill" data-sector="health">🏥 Health</button>
-                </div>
-                <div id="expertAdviceArea"></div>
+            <div id="publicFeed" class="confession-feed">Loading confessions...</div>
+        </div>
+
+        <div class="card">
+            <h2><i class="fas fa-user-md"></i> Advice from experts</h2>
+            <div class="filter-bar" id="expertSectors">
+                <button class="filter-chip active" data-sector="mental health">🧠 Mental Health</button>
+                <button class="filter-chip" data-sector="relationships">❤️ Relationships</button>
+                <button class="filter-chip" data-sector="career">💼 Career</button>
+                <button class="filter-chip" data-sector="finance">💰 Finance</button>
+                <button class="filter-chip" data-sector="health">🏥 Health</button>
             </div>
+            <div id="expertAdviceArea"></div>
         </div>
     </div>
 
-    <!-- Community section -->
-    <div class="card">
-        <h2><i class="fas fa-users"></i> Community advice</h2>
-        <div id="communityAdviceArea">Loading advice from community...</div>
-        <div style="margin-top: 1rem;">
-            <textarea id="communityAdviceText" rows="2" placeholder="Share your wisdom... (as a community member)"></textarea>
-            <button id="postCommunityAdvice" class="secondary-btn">Post advice</button>
+    <!-- Confession Detail View -->
+    <div id="detailView" class="view">
+        <div class="back-btn" id="backToFeed"><i class="fas fa-arrow-left"></i> Back to feed</div>
+        <div class="card">
+            <h2 id="detailTitle">Confession</h2>
+            <div id="detailConfession"></div>
         </div>
-    </div>
-
-    <div class="card">
-        <h2><i class="fas fa-newspaper"></i> Recent public confessions</h2>
-        <div id="publicFeed" class="confession-feed">Loading...</div>
+        <div class="card">
+            <h2><i class="fas fa-robot"></i> AI advice</h2>
+            <div id="detailAIAdvice"></div>
+        </div>
+        <div class="card">
+            <h2><i class="fas fa-users"></i> Community advice</h2>
+            <div id="detailCommunityAdvice"></div>
+            <textarea id="detailAdviceText" rows="2" placeholder="Share your advice..."></textarea>
+            <button id="postDetailAdvice">Post advice</button>
+        </div>
     </div>
 </div>
 <div id="toast" class="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
 <script>
-    // ---------- Data layer using localForage (IndexedDB) ----------
+    // ---------- Data Stores ----------
     const stores = {
         confessions: localforage.createInstance({ name: "whisper", storeName: "confessions" }),
         advice: localforage.createInstance({ name: "whisper", storeName: "advice" }),
-        votes: localforage.createInstance({ name: "whisper", storeName: "votes" })
+        votes: localforage.createInstance({ name: "whisper", storeName: "votes" }),
+        reports: localforage.createInstance({ name: "whisper", storeName: "reports" })
     };
 
     // Helper: generate unique ID
     function uid() {
-        return Date.now() + '-' + Math.random().toString(36).substr(2, 6);
+        return Date.now() + '-' + Math.random().toString(36).substr(2, 8);
     }
 
-    // ---------- Data functions ----------
+    // Get current user ID (persistent in localStorage)
+    let userId = localStorage.getItem('userId');
+    if (!userId) {
+        userId = 'user_' + Math.random().toString(36).substr(2, 8);
+        localStorage.setItem('userId', userId);
+    }
+
+    // ---------- Data operations ----------
     async function saveConfession(confession) {
         await stores.confessions.setItem(confession.id, confession);
         return confession;
@@ -293,9 +374,13 @@
     async function getPublicConfessions() {
         const confs = [];
         await stores.confessions.iterate((value, key) => {
-            if (value.isPublic) confs.push(value);
+            if (value.isPublic && !value.deleted) confs.push(value);
         });
         return confs.sort((a,b) => b.timestamp - a.timestamp);
+    }
+
+    async function getConfessionById(id) {
+        return await stores.confessions.getItem(id);
     }
 
     async function saveAdvice(advice) {
@@ -306,25 +391,32 @@
     async function getAdviceByConfession(confessionId) {
         const list = [];
         await stores.advice.iterate((value) => {
-            if (value.confessionId === confessionId) list.push(value);
+            if (value.confessionId === confessionId && !value.deleted && !value.reported) list.push(value);
         });
-        return list;
+        return list.sort((a,b) => b.timestamp - a.timestamp);
     }
 
     async function getAllAdvice() {
         const list = [];
-        await stores.advice.iterate((value) => list.push(value));
+        await stores.advice.iterate((value) => {
+            if (!value.deleted && !value.reported) list.push(value);
+        });
         return list;
     }
 
-    async function getVote(adviceId, userId) {
+    async function getVote(adviceId) {
         const key = `${adviceId}_${userId}`;
         return await stores.votes.getItem(key);
     }
 
-    async function setVote(adviceId, userId, voteType) {
+    async function setVote(adviceId, voteType) {
         const key = `${adviceId}_${userId}`;
         await stores.votes.setItem(key, { adviceId, userId, voteType, timestamp: Date.now() });
+    }
+
+    async function removeVote(adviceId) {
+        const key = `${adviceId}_${userId}`;
+        await stores.votes.removeItem(key);
     }
 
     async function getAdviceVoteCount(adviceId) {
@@ -336,6 +428,17 @@
             }
         });
         return { up, down, score: up - down };
+    }
+
+    async function reportAdvice(adviceId, reason = 'inappropriate') {
+        const key = `${adviceId}_${userId}`;
+        await stores.reports.setItem(key, { adviceId, userId, reason, timestamp: Date.now() });
+        // Mark advice as reported (soft delete from public view)
+        const advice = await stores.advice.getItem(adviceId);
+        if (advice) {
+            advice.reported = true;
+            await stores.advice.setItem(adviceId, advice);
+        }
     }
 
     // ---------- AI advice generator (enhanced) ----------
@@ -355,7 +458,7 @@
         return templates[category] || templates.other;
     }
 
-    // ---------- Expert advice database (static) ----------
+    // ---------- Expert advice database ----------
     const expertDB = {
         "mental health": { name: "Dr. Amara Chen, Clinical Psychologist", advice: "Your emotional well-being is paramount. If you're feeling overwhelmed, try the 5-4-3-2-1 grounding technique. Therapy is a sign of strength — there's no shame in seeking support." },
         "relationships": { name: "Luis M., Certified Relationship Coach", advice: "Healthy relationships require mutual respect and communication. If you're feeling unheard, consider writing a letter to express your needs. Boundaries protect your heart." },
@@ -382,89 +485,26 @@
         `;
         document.getElementById("expertAdviceArea").innerHTML = html;
         document.querySelector('.expert-upvote')?.addEventListener('click', () => showToast("Thanks for rating this expert!"));
-        document.querySelector('.expert-downvote')?.addEventListener('click', () => showToast("Feedback recorded. We'll improve matches."));
+        document.querySelector('.expert-downvote')?.addEventListener('click', () => showToast("Feedback recorded."));
     }
 
-    // ---------- Community advice rendering with votes ----------
-    async function renderCommunityAdvice() {
-        const allAdvice = await getAllAdvice();
-        const communityAdvice = allAdvice.filter(a => a.type === 'community');
-        if (communityAdvice.length === 0) {
-            document.getElementById("communityAdviceArea").innerHTML = "<p>No community advice yet. Be the first to share your wisdom!</p>";
-            return;
-        }
-        // sort by vote score
-        const withScores = await Promise.all(communityAdvice.map(async (adv) => {
-            const votes = await getAdviceVoteCount(adv.id);
-            return { ...adv, score: votes.score };
-        }));
-        withScores.sort((a,b) => b.score - a.score);
+    // ---------- Feed rendering ----------
+    let currentFilter = "all";
 
-        let html = '';
-        for (const adv of withScores) {
-            const votes = await getAdviceVoteCount(adv.id);
-            html += `
-                <div class="advice-item" data-id="${adv.id}">
-                    <div><strong>${adv.authorName || 'Anonymous'}</strong> · ${new Date(adv.timestamp).toLocaleString()}</div>
-                    <div>${adv.content}</div>
-                    <div class="advice-meta">
-                        <span><i class="fas fa-heart"></i> ${votes.score} points (${votes.up} up, ${votes.down} down)</span>
-                        <div class="votes">
-                            <button class="vote-btn upvote" data-id="${adv.id}"><i class="fas fa-arrow-up"></i> Up</button>
-                            <button class="vote-btn downvote" data-id="${adv.id}"><i class="fas fa-arrow-down"></i> Down</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        document.getElementById("communityAdviceArea").innerHTML = html;
-        attachVoteHandlers();
-    }
-
-    async function attachVoteHandlers() {
-        const upBtns = document.querySelectorAll('.upvote');
-        const downBtns = document.querySelectorAll('.downvote');
-        for (let btn of upBtns) {
-            btn.addEventListener('click', async (e) => {
-                const adviceId = btn.getAttribute('data-id');
-                const userId = localStorage.getItem('userId') || 'guest_' + Math.random();
-                localStorage.setItem('userId', userId);
-                const existing = await getVote(adviceId, userId);
-                if (existing && existing.voteType === 'up') {
-                    await stores.votes.removeItem(`${adviceId}_${userId}`);
-                } else {
-                    await setVote(adviceId, userId, 'up');
-                }
-                renderCommunityAdvice();
-            });
-        }
-        for (let btn of downBtns) {
-            btn.addEventListener('click', async (e) => {
-                const adviceId = btn.getAttribute('data-id');
-                const userId = localStorage.getItem('userId') || 'guest_' + Math.random();
-                localStorage.setItem('userId', userId);
-                const existing = await getVote(adviceId, userId);
-                if (existing && existing.voteType === 'down') {
-                    await stores.votes.removeItem(`${adviceId}_${userId}`);
-                } else {
-                    await setVote(adviceId, userId, 'down');
-                }
-                renderCommunityAdvice();
-            });
-        }
-    }
-
-    // ---------- Public confession feed ----------
     async function renderPublicFeed() {
         const confessions = await getPublicConfessions();
-        if (confessions.length === 0) {
+        let filtered = confessions;
+        if (currentFilter !== "all") {
+            filtered = confessions.filter(c => c.category === currentFilter);
+        }
+        if (filtered.length === 0) {
             document.getElementById("publicFeed").innerHTML = "<p>No public confessions yet. Share yours to start the conversation.</p>";
             return;
         }
         let html = '';
-        for (const conf of confessions) {
+        for (const conf of filtered) {
             html += `
-                <div class="confession-item">
+                <div class="confession-item" data-id="${conf.id}">
                     <div><strong>${conf.anonymous ? 'Anonymous' : 'Someone'}</strong> · ${conf.category}</div>
                     <div>${conf.text.substring(0, 200)}${conf.text.length > 200 ? '…' : ''}</div>
                     <div class="timestamp">${new Date(conf.timestamp).toLocaleString()}</div>
@@ -472,9 +512,136 @@
             `;
         }
         document.getElementById("publicFeed").innerHTML = html;
+        // attach click handlers
+        document.querySelectorAll('.confession-item').forEach(el => {
+            el.addEventListener('click', () => {
+                const id = el.getAttribute('data-id');
+                showConfessionDetail(id);
+            });
+        });
     }
 
-    // ---------- Submit confession ----------
+    // ---------- Confession detail view ----------
+    let currentConfessionId = null;
+
+    async function showConfessionDetail(confessionId) {
+        const confession = await getConfessionById(confessionId);
+        if (!confession) return;
+        currentConfessionId = confessionId;
+        document.getElementById("detailTitle").innerHTML = `Confession · ${confession.anonymous ? 'Anonymous' : 'Someone'}`;
+        document.getElementById("detailConfession").innerHTML = `
+            <div><strong>Category:</strong> ${confession.category}</div>
+            <div style="margin-top: 0.5rem;">${confession.text}</div>
+            <div class="timestamp">${new Date(confession.timestamp).toLocaleString()}</div>
+        `;
+
+        // AI advice
+        const allAdvice = await getAdviceByConfession(confessionId);
+        const aiAdvice = allAdvice.find(a => a.type === 'ai');
+        if (aiAdvice) {
+            document.getElementById("detailAIAdvice").innerHTML = `<div class="advice-item">${aiAdvice.content}<div class="advice-meta">🤖 AI advice</div></div>`;
+        } else {
+            document.getElementById("detailAIAdvice").innerHTML = "<p>No AI advice yet.</p>";
+        }
+
+        // Community advice
+        const communityAdvice = allAdvice.filter(a => a.type === 'community');
+        if (communityAdvice.length === 0) {
+            document.getElementById("detailCommunityAdvice").innerHTML = "<p>No community advice yet. Be the first to help!</p>";
+        } else {
+            // get vote counts and user votes
+            let adviceHtml = '';
+            for (const adv of communityAdvice) {
+                const votes = await getAdviceVoteCount(adv.id);
+                const userVote = await getVote(adv.id);
+                const upActive = userVote?.voteType === 'up' ? 'active' : '';
+                const downActive = userVote?.voteType === 'down' ? 'active' : '';
+                adviceHtml += `
+                    <div class="advice-item" data-id="${adv.id}">
+                        <div><strong>${adv.authorName || 'Anonymous'}</strong> · ${new Date(adv.timestamp).toLocaleString()}</div>
+                        <div>${adv.content}</div>
+                        <div class="advice-meta">
+                            <span><i class="fas fa-heart"></i> ${votes.score} points (${votes.up} up, ${votes.down} down)</span>
+                            <div class="votes">
+                                <button class="vote-btn upvote ${upActive}" data-id="${adv.id}"><i class="fas fa-arrow-up"></i> Up</button>
+                                <button class="vote-btn downvote ${downActive}" data-id="${adv.id}"><i class="fas fa-arrow-down"></i> Down</button>
+                                <button class="report-btn" data-id="${adv.id}"><i class="fas fa-flag"></i> Report</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            document.getElementById("detailCommunityAdvice").innerHTML = adviceHtml;
+            attachDetailVoteHandlers();
+            attachDetailReportHandlers();
+        }
+
+        // Switch views
+        document.getElementById("feedView").classList.remove("active");
+        document.getElementById("detailView").classList.add("active");
+    }
+
+    function attachDetailVoteHandlers() {
+        const upBtns = document.querySelectorAll('#detailCommunityAdvice .upvote');
+        const downBtns = document.querySelectorAll('#detailCommunityAdvice .downvote');
+        upBtns.forEach(btn => {
+            btn.removeEventListener('click', handleUpvote);
+            btn.addEventListener('click', handleUpvote);
+        });
+        downBtns.forEach(btn => {
+            btn.removeEventListener('click', handleDownvote);
+            btn.addEventListener('click', handleDownvote);
+        });
+    }
+
+    async function handleUpvote(e) {
+        const btn = e.currentTarget;
+        const adviceId = btn.getAttribute('data-id');
+        const existing = await getVote(adviceId);
+        if (existing && existing.voteType === 'up') {
+            await removeVote(adviceId);
+        } else {
+            if (existing && existing.voteType === 'down') {
+                await removeVote(adviceId);
+            }
+            await setVote(adviceId, 'up');
+        }
+        // refresh detail view to update votes
+        if (currentConfessionId) await showConfessionDetail(currentConfessionId);
+    }
+
+    async function handleDownvote(e) {
+        const btn = e.currentTarget;
+        const adviceId = btn.getAttribute('data-id');
+        const existing = await getVote(adviceId);
+        if (existing && existing.voteType === 'down') {
+            await removeVote(adviceId);
+        } else {
+            if (existing && existing.voteType === 'up') {
+                await removeVote(adviceId);
+            }
+            await setVote(adviceId, 'down');
+        }
+        if (currentConfessionId) await showConfessionDetail(currentConfessionId);
+    }
+
+    function attachDetailReportHandlers() {
+        const reportBtns = document.querySelectorAll('#detailCommunityAdvice .report-btn');
+        reportBtns.forEach(btn => {
+            btn.removeEventListener('click', handleReport);
+            btn.addEventListener('click', handleReport);
+        });
+    }
+
+    async function handleReport(e) {
+        const btn = e.currentTarget;
+        const adviceId = btn.getAttribute('data-id');
+        await reportAdvice(adviceId, 'inappropriate');
+        showToast("Advice reported. Thank you for helping keep the community safe.");
+        if (currentConfessionId) await showConfessionDetail(currentConfessionId);
+    }
+
+    // ---------- Submit new confession ----------
     document.getElementById("submitConfession").addEventListener("click", async () => {
         const text = document.getElementById("confessionText").value.trim();
         if (!text) { showToast("Please write your confession."); return; }
@@ -489,48 +656,79 @@
             anonymous,
             isPublic,
             timestamp: Date.now(),
-            userId: localStorage.getItem('userId') || 'guest_' + Math.random()
+            userId,
+            deleted: false
         };
         await saveConfession(confession);
-        localStorage.setItem('userId', confession.userId);
 
-        // Generate AI advice and save
+        // Generate and save AI advice
         const aiAdviceText = generateAIAdvice(text, category);
         const aiAdvice = {
             id: uid(),
             confessionId: confession.id,
             type: 'ai',
             content: aiAdviceText,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            deleted: false,
+            reported: false
         };
         await saveAdvice(aiAdvice);
-        document.getElementById("aiAdviceArea").innerHTML = `<div class="advice-item">${aiAdviceText}<div class="advice-meta">🤖 AI advice · generated just now</div></div>`;
 
-        // Show success and refresh feed
         showToast("Confession submitted! AI advice generated.");
         document.getElementById("confessionText").value = "";
-        renderPublicFeed();
-        renderCommunityAdvice(); // refresh votes display if needed
+        await renderPublicFeed();
     });
 
-    // ---------- Post community advice ----------
-    document.getElementById("postCommunityAdvice").addEventListener("click", async () => {
-        const content = document.getElementById("communityAdviceText").value.trim();
-        if (!content) { showToast("Please write some advice."); return; }
-        const userId = localStorage.getItem('userId') || 'guest_' + Math.random();
-        localStorage.setItem('userId', userId);
+    // ---------- Post community advice from detail view ----------
+    document.getElementById("postDetailAdvice").addEventListener("click", async () => {
+        const content = document.getElementById("detailAdviceText").value.trim();
+        if (!content) { showToast("Please write your advice."); return; }
+        if (!currentConfessionId) return;
         const advice = {
             id: uid(),
+            confessionId: currentConfessionId,
             type: 'community',
             content,
-            authorName: "Community Member", // could be user name later
+            authorName: "Community member",
             timestamp: Date.now(),
-            userId
+            userId,
+            deleted: false,
+            reported: false
         };
         await saveAdvice(advice);
-        showToast("Thank you for sharing your advice!");
-        document.getElementById("communityAdviceText").value = "";
-        renderCommunityAdvice();
+        showToast("Advice posted!");
+        document.getElementById("detailAdviceText").value = "";
+        await showConfessionDetail(currentConfessionId);
+    });
+
+    // ---------- Back to feed ----------
+    document.getElementById("backToFeed").addEventListener("click", () => {
+        document.getElementById("feedView").classList.add("active");
+        document.getElementById("detailView").classList.remove("active");
+        currentConfessionId = null;
+        renderPublicFeed();
+    });
+
+    // ---------- Filter chips ----------
+    const filterChips = document.querySelectorAll('#categoryFilter .filter-chip');
+    filterChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            filterChips.forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            currentFilter = chip.getAttribute('data-filter');
+            renderPublicFeed();
+        });
+    });
+
+    // ---------- Expert sector switching ----------
+    const expertChips = document.querySelectorAll('#expertSectors .filter-chip');
+    expertChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            expertChips.forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            activeExpertSector = chip.getAttribute('data-sector');
+            renderExpertAdvice();
+        });
     });
 
     // ---------- Theme toggle ----------
@@ -545,21 +743,14 @@
             icon.className = "fas fa-moon";
             themeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark mode';
         }
+        localStorage.setItem('darkMode', document.body.classList.contains('dark'));
     });
-
-    // ---------- Expert sector switching ----------
-    const sectorBtns = document.querySelectorAll("#expertSectors .pill");
-    sectorBtns.forEach(btn => {
-        btn.addEventListener("click", () => {
-            sectorBtns.forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            activeExpertSector = btn.getAttribute("data-sector");
-            renderExpertAdvice();
-        });
-    });
-    // set default active
-    document.querySelector('#expertSectors .pill[data-sector="mental health"]').classList.add("active");
-    renderExpertAdvice();
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark');
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i> Light mode';
+    } else {
+        themeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark mode';
+    }
 
     // ---------- Toast ----------
     function showToast(msg) {
@@ -572,8 +763,7 @@
     // ---------- Initial load ----------
     async function init() {
         await renderPublicFeed();
-        await renderCommunityAdvice();
-        document.getElementById("aiAdviceArea").innerHTML = "<div class='advice-item'>✨ Submit a confession to receive instant, empathetic advice.</div>";
+        renderExpertAdvice();
     }
     init();
 </script>
