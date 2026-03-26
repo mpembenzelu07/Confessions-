@@ -24,6 +24,7 @@
             --danger: #ef4444;
             --warning: #f59e0b;
             --accent: #ec489a;
+            --shadow: 0 4px 6px -2px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.1);
         }
 
         body.dark {
@@ -31,6 +32,7 @@
             --card: #1e293b;
             --text: #f1f5f9;
             --border: #334155;
+            --shadow: 0 4px 6px -2px rgba(0,0,0,0.3), 0 10px 15px -3px rgba(0,0,0,0.2);
         }
 
         body {
@@ -88,7 +90,7 @@
 
         .icon-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
         }
 
         .notification-badge {
@@ -117,7 +119,7 @@
             border-radius: 1.5rem;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px -2px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
             border: 1px solid var(--border);
             transition: transform 0.2s, box-shadow 0.2s;
         }
@@ -177,6 +179,7 @@
 
         .secondary-btn:hover {
             background: var(--bg);
+            transform: scale(0.98);
         }
 
         .danger-btn {
@@ -663,7 +666,6 @@
         if (existing && existing.voteType === voteType) {
             await stores.votes.removeItem(key);
         } else {
-            // remove opposite vote if exists
             if (existing) await stores.votes.removeItem(key);
             const advice = await stores.advice.getItem(adviceId);
             await stores.votes.setItem(key, {
